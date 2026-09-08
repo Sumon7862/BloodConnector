@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout.jsx'
 import Field from '../components/Field.jsx'
 import PasswordInput from '../components/PasswordInput.jsx'
@@ -33,6 +33,7 @@ const INITIAL = {
 }
 
 export default function SignUp() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { register } = useAuth()
   const [values, setValues] = useState(INITIAL)
@@ -113,7 +114,8 @@ export default function SignUp() {
       setTouched((current) => ({ ...current, emailOrPhone: true }))
       return
     }
-    navigate('/dashboard', { replace: true })
+    const from = location.state?.from
+    navigate(typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : '/dashboard', { replace: true })
   }
 
   const passwordOk = values.password.length >= 8
@@ -317,7 +319,7 @@ export default function SignUp() {
         </button>
 
         <p className="mt-[18px] text-center text-sm text-slate-500">
-          Already have an account? <Link to="/login" className="font-bold text-brand no-underline hover:underline">Login</Link>
+          Already have an account? <Link to="/login" state={location.state} className="font-bold text-brand no-underline hover:underline">Login</Link>
         </p>
       </form>
     </AuthLayout>

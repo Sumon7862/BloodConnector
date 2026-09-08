@@ -68,22 +68,49 @@ export const SEED_OPINIONS = [
 ]
 
 const STORAGE_KEY = 'bloodconnector-gallery'
+export const OPINIONS_EVENT = 'bloodconnector-opinions'
+export const MAX_OPINION_CHARS = 100
 
-export function loadOpinions() {
+function loadStored() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     const extra = raw ? JSON.parse(raw) : []
-    return [...(Array.isArray(extra) ? extra : []), ...SEED_OPINIONS]
+    return Array.isArray(extra) ? extra : []
   } catch {
-    return [...SEED_OPINIONS]
+    return []
   }
 }
 
+export function loadOpinions() {
+  return [...loadStored(), ...SEED_OPINIONS]
+}
+
+export function findUserOpinion(userId) {
+  if (!userId) return null
+  return loadStored().find((item) => item.userId === userId) || null
+}
+
 export function saveOpinion(opinion) {
-  const current = loadOpinions().filter((item) => !String(item.id).startsWith('seed-'))
-  const next = [opinion, ...current]
+  const stored = loadStored()
+  const existing = stored.find((item) => item.userId && item.userId === opinion.userId)
+  const record = {
+    ...opinion,
+    id: existing?.id || opinion.id || crypto.randomUUID(),
+    createdAt: existing?.createdAt || opinion.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+  const next = [record, ...stored.filter((item) => item.userId !== opinion.userId)]
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-  return [...next, ...SEED_OPINIONS]
+  window.dispatchEvent(new Event(OPINIONS_EVENT))
+  return loadOpinions()
+}
+
+export function deleteOpinion(userId) {
+  if (!userId) return loadOpinions()
+  const next = loadStored().filter((item) => item.userId !== userId)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+  window.dispatchEvent(new Event(OPINIONS_EVENT))
+  return loadOpinions()
 }
 
 export function formatOpinionDate(iso) {

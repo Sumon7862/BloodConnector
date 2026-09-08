@@ -2,22 +2,25 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import DashPageHead from '../../components/DashPageHead.jsx'
 import DonationCountdown from '../../components/DonationCountdown.jsx'
+import RequestCard from '../../components/RequestCard.jsx'
 import { Icon } from '../../components/DashIcons.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { roleLabel } from '../../lib/user.js'
 import { btnOutline, cardClass } from '../../lib/classes.js'
 import { DONATION_WAIT_DAYS, isDonationEligible, markDonatedNow } from '../../lib/eligibility.js'
+import { matchingRequestsFor, useRequests } from '../../lib/requests.js'
 import {
   RECENT_ACTIVITY,
   UPCOMING_EVENTS,
-  URGENT_REQUESTS,
 } from '../../data/dashboardData.js'
 
 export default function DashboardHome() {
   const { user, updateUser } = useAuth()
+  const requests = useRequests()
   const isDoctor = user.role === 'doctor'
   const firstName = String(user.name || 'there').split(' ')[0]
   const eligible = isDonationEligible(user.nextEligibleAt)
+  const liveRequests = matchingRequestsFor(user, requests).slice(0, 3)
 
   useEffect(() => {
     document.title = 'BloodConnector — Dashboard'
@@ -87,33 +90,32 @@ export default function DashboardHome() {
         </section>
       ) : null}
 
-      <div className="mt-6 grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
-        <section className={`${cardClass} p-5`}>
-          <div className="mb-4 flex items-center gap-2">
-            <h2 className="m-0 text-lg font-extrabold">Urgent Blood Requests</h2>
+      <section className="mt-6">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <h2 className="m-0 text-lg font-extrabold">Matching blood requests</h2>
             <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-bold text-white">Live</span>
           </div>
-          <div className="space-y-3">
-            {URGENT_REQUESTS.map((item) => (
-              <article key={item.id} className="flex flex-col gap-3 rounded-xl border border-slate-200 p-3 sm:flex-row sm:items-center dark:border-slate-700">
-                <strong className="text-xl text-brand">{item.type}</strong>
-                <p className="m-0 flex flex-1 items-center gap-1.5 text-sm text-slate-500">
-                  <Icon name="pin" className="h-4 w-4" /> {item.location}
-                </p>
-                <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-                  item.level === 'Critical' ? 'bg-rose-100 text-brand' : 'bg-amber-100 text-amber-700'
-                }`}
-                >
-                  {item.level}
-                </span>
-                <Link to="/dashboard/request-blood" className="inline-flex h-10 items-center justify-center rounded-lg bg-brand px-4 text-sm font-bold text-white no-underline hover:bg-brand-hover">
-                  Respond Now
-                </Link>
-              </article>
+          <Link to="/dashboard/open-requests" className="text-sm font-bold text-brand no-underline hover:underline">
+            See all
+          </Link>
+        </div>
+        {liveRequests.length ? (
+          <div className="grid gap-4 md:grid-cols-3">
+            {liveRequests.map((item) => (
+              <RequestCard key={item.id} request={item} mode="inbox" />
             ))}
           </div>
-        </section>
+        ) : (
+          <p className={`${cardClass} px-5 py-8 text-center text-sm text-slate-500`}>
+            {user.bloodGroup
+              ? `No open ${user.bloodGroup} requests right now.`
+              : 'Add your blood group in Profile to receive matching requests.'}
+          </p>
+        )}
+      </section>
 
+      <div className="mt-6 grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
         <section className={`${cardClass} p-5`}>
           <h2 className="m-0 text-lg font-extrabold">Upcoming Donations</h2>
           <div className="mt-4 space-y-3">
@@ -138,24 +140,24 @@ export default function DashboardHome() {
             View All {isDoctor ? 'Appointments' : 'Donations'}
           </Link>
         </section>
-      </div>
 
-      <section className={`${cardClass} mt-5 p-5`}>
-        <h2 className="m-0 text-lg font-extrabold">Recent Activity</h2>
-        <ul className="mt-4 mb-0 list-none space-y-3 p-0">
-          {RECENT_ACTIVITY.map((item) => (
-            <li key={item.id} className="flex items-start gap-3">
-              <span className="mt-0.5 grid h-8 w-8 place-items-center rounded-full bg-rose-50 text-brand dark:bg-brand/15">
-                <Icon name="heart" className="h-4 w-4" />
-              </span>
-              <div>
-                <p className="m-0 text-sm font-semibold">{item.text}</p>
-                <p className="mt-0.5 mb-0 text-xs text-slate-400">{item.time}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+        <section className={`${cardClass} p-5`}>
+          <h2 className="m-0 text-lg font-extrabold">Recent Activity</h2>
+          <ul className="mt-4 mb-0 list-none space-y-3 p-0">
+            {RECENT_ACTIVITY.map((item) => (
+              <li key={item.id} className="flex items-start gap-3">
+                <span className="mt-0.5 grid h-8 w-8 place-items-center rounded-full bg-rose-50 text-brand dark:bg-brand/15">
+                  <Icon name="heart" className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="m-0 text-sm font-semibold">{item.text}</p>
+                  <p className="mt-0.5 mb-0 text-xs text-slate-400">{item.time}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
 
       <section className="mt-5 rounded-[14px] bg-[linear-gradient(90deg,#e11d2d,#fb7185)] p-5 sm:p-6">
         <div className="grid gap-3 sm:grid-cols-3">

@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import Navbar from './components/Navbar.jsx'
@@ -9,6 +9,7 @@ import Donors from './pages/Donors.jsx'
 import DonorHistory from './pages/DonorHistory.jsx'
 import Doctors from './pages/Doctors.jsx'
 import DoctorDetails from './pages/DoctorDetails.jsx'
+import BloodRequests from './pages/BloodRequests.jsx'
 import Gallery from './pages/Gallery.jsx'
 import Login from './pages/Login.jsx'
 import SignUp from './pages/SignUp.jsx'
@@ -21,6 +22,7 @@ import BloodTypes from './pages/dashboard/BloodTypes.jsx'
 import Consultation from './pages/dashboard/Consultation.jsx'
 import DashboardProfile from './pages/dashboard/Profile.jsx'
 import FamilyDonors from './pages/dashboard/FamilyDonors.jsx'
+import OpenRequests from './pages/dashboard/OpenRequests.jsx'
 import Notifications from './pages/dashboard/Notifications.jsx'
 import SettingsPage from './pages/dashboard/Settings.jsx'
 
@@ -32,7 +34,8 @@ function GuestOnly({ children }) {
 
 function RequireAuth({ children }) {
   const { isLoggedIn } = useAuth()
-  if (!isLoggedIn) return <Navigate to="/login" replace />
+  const location = useLocation()
+  if (!isLoggedIn) return <Navigate to="/login" replace state={{ from: location.pathname }} />
   return children
 }
 
@@ -48,6 +51,7 @@ function AppRoutes() {
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/doctors/:id" element={<DoctorDetails />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/requests" element={<BloodRequests />} />
         <Route
           path="/login"
           element={
@@ -77,6 +81,7 @@ function AppRoutes() {
           <Route path="profile" element={<DashboardProfile />} />
           <Route path="people" element={<FamilyDonors />} />
           <Route path="request-blood" element={<RequestBlood />} />
+          <Route path="open-requests" element={<OpenRequests />} />
           <Route path="donations" element={<MyDonations />} />
           <Route path="gallery" element={<DashboardGallery />} />
           <Route path="blood-types" element={<BloodTypes />} />

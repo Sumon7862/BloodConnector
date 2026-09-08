@@ -16,6 +16,7 @@ export default function Footer() {
           <h3 className="mb-3 text-base font-bold">Quick Links</h3>
           <ul className="m-0 list-none space-y-2 p-0 text-sm">
             <li><Link className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" to="/donors">Find Donors</Link></li>
+            <li><Link className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" to="/requests">Blood Requests</Link></li>
             <li><Link className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" to="/doctors">Free Doctor Service</Link></li>
             <li><Link className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" to="/gallery">Gallery</Link></li>
             <li><Link className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" to="/about">About</Link></li>

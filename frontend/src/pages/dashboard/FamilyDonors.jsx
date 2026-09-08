@@ -5,7 +5,7 @@ import DonorAvatar from '../../components/DonorAvatar.jsx'
 import { Icon } from '../../components/DashIcons.jsx'
 import { IconInput, IconSelect } from '../../components/IconField.jsx'
 import { btnOutline, cardClass } from '../../lib/classes.js'
-import { BLOOD_GROUPS } from '../../utils/validation.js'
+import { BLOOD_GROUPS, validateEmail, validateFullName, validatePhone, validateRequired } from '../../utils/validation.js'
 import { SEED_FAMILY } from '../../data/dashboardData.js'
 import { loadFamily, loadFriends, removeKnownDonor, saveFamily } from '../../lib/people.js'
 import { parseEligibleAt } from '../../lib/eligibility.js'
@@ -26,6 +26,7 @@ export default function FamilyDonors() {
   const [family, setFamily] = useState(() => loadFamily(user, SEED_FAMILY))
   const [adding, setAdding] = useState(false)
   const [member, setMember] = useState(EMPTY_MEMBER)
+  const [memberError, setMemberError] = useState('')
 
   useEffect(() => {
     document.title = 'BloodConnector — Family & Donors'
@@ -38,7 +39,15 @@ export default function FamilyDonors() {
 
   function addMember(event) {
     event.preventDefault()
-    if (!member.name.trim() || !member.relation.trim()) return
+    const nextError =
+      validateFullName(member.name) ||
+      validateRequired(member.relation, 'Please enter the relationship.') ||
+      (member.phone.trim() ? validatePhone(member.phone) : '') ||
+      (member.email.trim() ? validateEmail(member.email) : '')
+    if (nextError) {
+      setMemberError(nextError)
+      return
+    }
     persistFamily([
       {
         id: crypto.randomUUID(),
@@ -51,6 +60,7 @@ export default function FamilyDonors() {
       ...family,
     ])
     setMember(EMPTY_MEMBER)
+    setMemberError('')
     setAdding(false)
   }
 
@@ -141,29 +151,32 @@ export default function FamilyDonors() {
               Manage your family members&apos; blood donation information.
             </p>
           </div>
-          <button type="button" className={btnOutline} onClick={() => setAdding((open) => !open)}>
+          <button type="button" className={btnOutline} onClick={() => { setAdding((open) => !open); setMemberError('') }}>
             + Add Family Member
           </button>
         </div>
 
         {adding ? (
-          <form className="mb-4 grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-2 dark:border-slate-700" onSubmit={addMember}>
-            <IconInput placeholder="Full name" value={member.name} onChange={(event) => setMember({ ...member, name: event.target.value })} />
-            <IconInput placeholder="Relationship" value={member.relation} onChange={(event) => setMember({ ...member, relation: event.target.value })} />
+          <form className="mb-4 grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-2 dark:border-slate-700" onSubmit={addMember} noValidate>
+            <IconInput placeholder="Full name" value={member.name} onChange={(event) => { setMember({ ...member, name: event.target.value }); setMemberError('') }} />
+            <IconInput placeholder="Relationship" value={member.relation} onChange={(event) => { setMember({ ...member, relation: event.target.value }); setMemberError('') }} />
             <IconSelect value={member.bloodType} onChange={(event) => setMember({ ...member, bloodType: event.target.value })}>
               {BLOOD_GROUPS.map((type) => (
                 <option key={type}>{type}</option>
               ))}
             </IconSelect>
-            <IconInput placeholder="Phone" value={member.phone} onChange={(event) => setMember({ ...member, phone: event.target.value })} />
+            <IconInput placeholder="Phone" value={member.phone} onChange={(event) => { setMember({ ...member, phone: event.target.value }); setMemberError('') }} />
             <div className="sm:col-span-2">
-              <IconInput placeholder="Email" value={member.email} onChange={(event) => setMember({ ...member, email: event.target.value })} />
+              <IconInput placeholder="Email" value={member.email} onChange={(event) => { setMember({ ...member, email: event.target.value }); setMemberError('') }} />
             </div>
+            {memberError ? (
+              <p className="m-0 text-sm font-medium text-brand sm:col-span-2" role="alert">{memberError}</p>
+            ) : null}
             <div className="flex gap-2 sm:col-span-2">
               <button type="submit" className="inline-flex h-10 items-center rounded-lg bg-brand px-4 text-sm font-bold text-white">
                 Save member
               </button>
-              <button type="button" className="h-10 px-3 text-sm font-bold text-slate-500" onClick={() => setAdding(false)}>
+              <button type="button" className="h-10 px-3 text-sm font-bold text-slate-500" onClick={() => { setAdding(false); setMemberError('') }}>
                 Cancel
               </button>
             </div>

@@ -1,7 +1,7 @@
 import { Icon } from './DashIcons.jsx'
 import { dashInput } from '../lib/classes.js'
 
-export default function IconField({ id, label, icon, required, children }) {
+export default function IconField({ id, label, icon, required, error, children }) {
   return (
     <label className="block" htmlFor={id}>
       <span className="mb-1.5 block text-sm font-semibold">
@@ -9,6 +9,11 @@ export default function IconField({ id, label, icon, required, children }) {
         {required ? <span className="text-brand"> *</span> : null}
       </span>
       {children || null}
+      {error ? (
+        <p className="mt-1.5 mb-0 text-xs font-medium text-brand" role="alert">
+          {error}
+        </p>
+      ) : null}
     </label>
   )
 }

@@ -59,27 +59,3 @@ export const HOW_IT_WORKS = [
     copy: 'Give blood, track your next eligible date, and get free medical advice.',
   },
 ]
-
-export const IMPACT_CARDS = [
-  {
-    id: 'drive',
-    title: 'Host a Blood Drive',
-    copy: 'Organize a drive at your campus, office, or community center.',
-    to: '/gallery',
-    action: 'See community stories',
-  },
-  {
-    id: 'volunteer',
-    title: 'Become a Volunteer',
-    copy: 'Help coordinate donors, requests, and emergency matching.',
-    to: '/signup',
-    action: 'Create an account',
-  },
-  {
-    id: 'donate',
-    title: 'Support the Mission',
-    copy: 'Learn how BloodConnector connects families during emergencies.',
-    to: '/about',
-    action: 'Read about us',
-  },
-]

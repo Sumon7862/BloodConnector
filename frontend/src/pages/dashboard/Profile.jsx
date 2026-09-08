@@ -9,6 +9,7 @@ import { DONATION_WAIT_DAYS, isDonationEligible, markDonatedNow } from '../../li
 import {
   BLOOD_GROUPS,
   validateAddress,
+  validateAge,
   validateBloodGroup,
   validateEmail,
   validateFullName,
@@ -135,10 +136,14 @@ export default function DashboardProfile() {
       email: form.email.trim() ? validateEmail(form.email) : '',
       phone: validatePhone(form.phone, { required: !form.email.trim() && extraPhones.length === 0 }),
       bloodGroup: isDoctor ? '' : validateBloodGroup(form.bloodGroup),
+      age: validateAge(form.age, user.role),
     }
     const hasError = Object.values(nextErrors).some(Boolean)
     setErrors(nextErrors)
-    if (hasError) return
+    if (hasError) {
+      setSaved(false)
+      return
+    }
 
     updateUser({
       name: form.name.trim(),
@@ -309,7 +314,7 @@ export default function DashboardProfile() {
             <Field label="Phone Number" error={errors.phone}>
               <IconInput icon="phone" value={form.phone} readOnly={!editing} onChange={(event) => setField('phone', event.target.value)} />
             </Field>
-            <Field label="Age">
+            <Field label="Age" error={errors.age}>
               <IconInput icon="calendar" value={form.age} readOnly={!editing} onChange={(event) => setField('age', event.target.value)} />
             </Field>
             {isDoctor ? (

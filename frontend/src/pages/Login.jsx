@@ -71,7 +71,9 @@ export default function Login() {
       setFormError(result.error)
       return
     }
-    navigate('/dashboard', { replace: true })
+    const from = location.state?.from
+    const next = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : '/dashboard'
+    navigate(next, { replace: true })
   }
 
   return (
@@ -117,7 +119,7 @@ export default function Login() {
         {formError ? <p className="mt-3 mb-0 text-center text-sm font-medium text-brand">{formError}</p> : null}
 
         <p className="mt-[18px] text-center text-sm text-slate-500">
-          Do not have an account? <Link to="/signup" className="font-bold text-brand no-underline hover:underline">Create Account</Link>
+          Do not have an account? <Link to="/signup" state={location.state} className="font-bold text-brand no-underline hover:underline">Create Account</Link>
         </p>
       </form>
 

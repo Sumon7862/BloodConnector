@@ -103,3 +103,22 @@ export function validateConfirmPassword(password, confirmPassword) {
   if (confirmPassword !== password) return 'Passwords do not match'
   return ''
 }
+
+export function validateOpinion(value, { maxChars = 100 } = {}) {
+  const trimmed = String(value || '').trim()
+  if (!trimmed) return 'Please write your opinion.'
+  if (trimmed.length > maxChars) return `Opinion cannot be more than ${maxChars} characters.`
+  return ''
+}
+
+export function validateRating(value) {
+  const rating = Number(value)
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return 'Please select a rating from 1 to 5.'
+  }
+  return ''
+}
+
+export function validateRequired(value, message) {
+  return String(value || '').trim() ? '' : message
+}

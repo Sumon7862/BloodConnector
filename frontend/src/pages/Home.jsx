@@ -2,25 +2,23 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
 import DonorCard from '../components/DonorCard.jsx'
+import OpinionSlider from '../components/OpinionSlider.jsx'
+import RequestCard from '../components/RequestCard.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import {
   BLOOD_TYPES,
   BLOOD_BANKS,
   HOME_STATS,
   HOW_IT_WORKS,
-  IMPACT_CARDS,
 } from '../data/homeData.js'
 import { DONORS } from '../data/donors.js'
 import { btnOutline, cardClass, inputClass } from '../lib/classes.js'
-
-const impactVisual = {
-  drive: 'bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.35),transparent_36%),linear-gradient(135deg,#fb7185,#9f1239)]',
-  volunteer: 'bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.28),transparent_32%),linear-gradient(135deg,#38bdf8,#0b2447)]',
-  donate: 'bg-[radial-gradient(circle_at_40%_60%,rgba(255,255,255,0.3),transparent_34%),linear-gradient(135deg,#fbbf24,#e11d2d)]',
-}
+import { openRequests, useRequests } from '../lib/requests.js'
 
 export default function Home() {
   const { isLoggedIn } = useAuth()
+  const requests = useRequests()
+  const urgent = openRequests(requests).slice(0, 3)
   const [params] = useSearchParams()
   const [city, setCity] = useState(() => params.get('city') || '')
   const [bloodType, setBloodType] = useState(() => params.get('bloodType') || '')
@@ -202,6 +200,25 @@ export default function Home() {
         </div>
       </section>
 
+      {urgent.length ? (
+        <section className="mx-auto w-[min(1180px,calc(100%-24px))] pt-14 sm:w-[min(1180px,calc(100%-32px))] sm:pt-16" id="requests">
+          <header className="mb-7 text-center">
+            <h2 className="m-0 text-[clamp(24px,3vw,32px)] font-extrabold tracking-tight">Urgent blood requests</h2>
+          <p className="mt-2 mb-0 text-slate-500 dark:text-slate-400">
+            Live requests from members. Matching blood-group donors get these on their dashboard.
+          </p>
+        </header>
+        <div className="grid gap-4 md:grid-cols-3">
+          {urgent.map((request) => (
+            <RequestCard key={request.id} request={request} mode="feed" />
+          ))}
+        </div>
+          <div className="mt-6 flex justify-center">
+            <Link to="/requests" className={`${btnOutline} h-11 px-6 no-underline`}>See all requests</Link>
+          </div>
+        </section>
+      ) : null}
+
       <section className="mx-auto w-[min(1180px,calc(100%-24px))] pt-14 pb-6 sm:w-[min(1180px,calc(100%-32px))] sm:pt-16" id="availability">
         <header className="mb-7 text-center">
           <h2 className="m-0 text-[clamp(24px,3vw,32px)] font-extrabold tracking-tight">Blood availability in your area</h2>
@@ -273,28 +290,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mt-12 bg-brand py-14 text-white" id="impact">
-        <h2 className="mx-auto mb-3 w-[min(1180px,calc(100%-24px))] text-center text-[clamp(24px,3vw,32px)] font-extrabold text-white sm:w-[min(1180px,calc(100%-32px))]">
-          More ways you can make a difference
-        </h2>
-        <p className="mx-auto mb-8 max-w-2xl w-[min(1180px,calc(100%-24px))] text-center text-sm text-white/85 sm:w-[min(1180px,calc(100%-32px))]">
-          Donate, volunteer, or share your story. Every action helps someone reach a hospital in time.
-        </p>
-        <div className="mx-auto grid w-[min(1180px,calc(100%-24px))] gap-4 sm:w-[min(1180px,calc(100%-32px))] sm:grid-cols-2 xl:grid-cols-3">
-          {IMPACT_CARDS.map((card) => (
-            <article key={card.id} className="overflow-hidden rounded-[14px] bg-white text-slate-900 dark:bg-panel dark:text-slate-100">
-              <div className={`h-[150px] ${impactVisual[card.id]}`} aria-hidden="true" />
-              <div className="px-5 pt-4 pb-5">
-                <h3 className="m-0 text-[17px] font-extrabold">{card.title}</h3>
-                <p className="mt-2 mb-4 text-sm text-slate-500 dark:text-slate-400">{card.copy}</p>
-                <Link to={card.to} className="font-extrabold text-brand no-underline hover:underline">
-                  {card.action}
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+      <OpinionSlider />
 
       <section className="mx-auto w-[min(1180px,calc(100%-24px))] pt-12 pb-16 sm:w-[min(1180px,calc(100%-32px))] sm:pt-16" id="doctors">
         <header className="mb-7 text-center">
