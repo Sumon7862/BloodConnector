@@ -3,9 +3,11 @@ dist
 dist-ssr
 .env
 .env.*
+!.env.example
 *.local
 *.log
 .DS_Store
 .idea
 .vscode
 .cursor
+backend/data/*.json

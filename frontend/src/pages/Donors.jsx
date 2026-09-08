@@ -4,7 +4,7 @@ import Layout from '../components/Layout.jsx'
 import DonorCard from '../components/DonorCard.jsx'
 import BloodTypeBadge from '../components/BloodTypeBadge.jsx'
 import { BLOOD_TYPES } from '../data/homeData.js'
-import { DONOR_AREAS, DONORS } from '../data/donors.js'
+import { fetchDonors } from '../lib/directory.js'
 import { inputClass } from '../lib/classes.js'
 import { donorFiltersToParams, filterDonors, readDonorFilters } from '../lib/donorsFilter.js'
 
@@ -17,9 +17,16 @@ const AVAILABILITY_OPTIONS = [
 export default function Donors() {
   const [params, setParams] = useSearchParams()
   const [filters, setFilters] = useState(() => readDonorFilters(params))
+  const [allDonors, setAllDonors] = useState([])
 
   useEffect(() => {
     document.title = 'BloodConnector — Donors'
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchDonors().then((list) => { if (!cancelled) setAllDonors(list) })
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
@@ -55,8 +62,12 @@ export default function Donors() {
   }
 
   const donors = useMemo(
-    () => filterDonors(DONORS, filters),
-    [filters],
+    () => filterDonors(allDonors, filters),
+    [filters, allDonors],
+  )
+  const donorAreas = useMemo(
+    () => [...new Set(allDonors.flatMap((item) => [item.area, item.city].filter(Boolean)))].sort(),
+    [allDonors],
   )
 
   const hasFilters = Boolean(filters.q || filters.area || filters.bloodType || filters.availability)
@@ -110,7 +121,7 @@ export default function Donors() {
               onChange={(event) => setFilter('area', event.target.value)}
             />
             <datalist id="donor-areas">
-              {DONOR_AREAS.map((item) => (
+              {donorAreas.map((item) => (
                 <option key={item} value={item} />
               ))}
             </datalist>

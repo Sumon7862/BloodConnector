@@ -22,21 +22,22 @@ function usePerView() {
 }
 
 export default function OpinionSlider() {
-  const [opinions, setOpinions] = useState(() => loadOpinions())
+  const [opinions, setOpinions] = useState([])
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const perView = usePerView()
   const maxIndex = Math.max(0, opinions.length - perView)
 
   useEffect(() => {
+    let cancelled = false
     function refresh() {
-      setOpinions(loadOpinions())
+      loadOpinions().then((list) => { if (!cancelled) setOpinions(list) })
     }
+    refresh()
     window.addEventListener(OPINIONS_EVENT, refresh)
-    window.addEventListener('storage', refresh)
     return () => {
+      cancelled = true
       window.removeEventListener(OPINIONS_EVENT, refresh)
-      window.removeEventListener('storage', refresh)
     }
   }, [])
 

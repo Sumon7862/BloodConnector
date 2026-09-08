@@ -10,10 +10,23 @@ import { btnPrimary, cardClass, inputClass, pageWidth } from '../lib/classes.js'
 
 export default function Gallery() {
   const { user, isLoggedIn } = useAuth()
-  const [opinions, setOpinions] = useState(() => loadOpinions())
+  const [opinions, setOpinions] = useState([])
 
   useEffect(() => {
     document.title = 'BloodConnector — Gallery'
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    function refresh() {
+      loadOpinions().then((list) => { if (!cancelled) setOpinions(list) })
+    }
+    refresh()
+    window.addEventListener('bloodconnector-opinions', refresh)
+    return () => {
+      cancelled = true
+      window.removeEventListener('bloodconnector-opinions', refresh)
+    }
   }, [])
 
   return (
@@ -54,7 +67,7 @@ export default function Gallery() {
           </header>
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {opinions.map((item) => (
+            {opinions.length ? opinions.map((item) => (
               <article key={item.id} className={`${cardClass} flex flex-col p-5`}>
                 <div className="flex items-start gap-3">
                   <DonorAvatar name={item.name} photo={item.photo} />
@@ -79,7 +92,11 @@ export default function Gallery() {
                     : formatOpinionDate(item.createdAt)}
                 </p>
               </article>
-            ))}
+            )) : (
+              <p className={`${cardClass} px-5 py-10 text-center text-slate-500 sm:col-span-2 xl:col-span-3`}>
+                No community stories yet.
+              </p>
+            )}
           </div>
         </section>
       </div>

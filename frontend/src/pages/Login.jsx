@@ -5,6 +5,8 @@ import Field from '../components/Field.jsx'
 import PasswordInput from '../components/PasswordInput.jsx'
 import ForgotPasswordModal from '../components/ForgotPasswordModal.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { homePath } from '../lib/user.js'
+import { openAdminApp } from '../lib/apps.js'
 import { validateEmailOrPhone, validatePassword } from '../utils/validation.js'
 import { btnPrimary, inputClass } from '../lib/classes.js'
 
@@ -60,19 +62,21 @@ export default function Login() {
     if (!validateAll()) return
 
     setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 900))
-    const result = login({
-      name: values.emailOrPhone.includes('@') ? values.emailOrPhone.split('@')[0] : 'Member',
+    const result = await login({
       emailOrPhone: values.emailOrPhone,
       password: values.password,
     })
     setLoading(false)
+    if (result.adminRedirect) {
+      if (!openAdminApp()) setFormError('Use the admin panel to sign in.')
+      return
+    }
     if (!result.ok) {
       setFormError(result.error)
       return
     }
     const from = location.state?.from
-    const next = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : '/dashboard'
+    const next = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : homePath(result.user)
     navigate(next, { replace: true })
   }
 

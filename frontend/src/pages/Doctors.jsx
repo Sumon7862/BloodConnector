@@ -1,14 +1,22 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Layout from '../components/Layout.jsx'
 import PageHero from '../components/PageHero.jsx'
 import DoctorCard from '../components/DoctorCard.jsx'
 import SectionHeader from '../components/SectionHeader.jsx'
-import { DOCTORS, DOCTOR_HERO_COPY } from '../data/doctors.js'
+import { DOCTOR_HERO_COPY, fetchDoctors } from '../data/doctors.js'
 import { pageWidth } from '../lib/classes.js'
 
 export default function Doctors() {
+  const [doctors, setDoctors] = useState([])
+
   useEffect(() => {
     document.title = 'BloodConnector — Doctors'
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchDoctors().then((list) => { if (!cancelled) setDoctors(list) })
+    return () => { cancelled = true }
   }, [])
 
   return (
@@ -23,7 +31,7 @@ export default function Doctors() {
           subtitle="Call for eligibility, recovery, or emergency advice while a blood match is underway."
         />
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {DOCTORS.map((doctor) => (
+          {doctors.map((doctor) => (
             <DoctorCard key={doctor.id} doctor={doctor} />
           ))}
         </div>

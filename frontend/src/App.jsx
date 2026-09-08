@@ -25,16 +25,19 @@ import FamilyDonors from './pages/dashboard/FamilyDonors.jsx'
 import OpenRequests from './pages/dashboard/OpenRequests.jsx'
 import Notifications from './pages/dashboard/Notifications.jsx'
 import SettingsPage from './pages/dashboard/Settings.jsx'
+import { homePath } from './lib/user.js'
 
 function GuestOnly({ children }) {
-  const { isLoggedIn } = useAuth()
-  if (isLoggedIn) return <Navigate to="/dashboard" replace />
+  const { isLoggedIn, ready, user } = useAuth()
+  if (!ready) return null
+  if (isLoggedIn) return <Navigate to={homePath(user)} replace />
   return children
 }
 
 function RequireAuth({ children }) {
-  const { isLoggedIn } = useAuth()
+  const { isLoggedIn, ready } = useAuth()
   const location = useLocation()
+  if (!ready) return null
   if (!isLoggedIn) return <Navigate to="/login" replace state={{ from: location.pathname }} />
   return children
 }

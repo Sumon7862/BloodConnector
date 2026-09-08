@@ -77,6 +77,7 @@ export default function DashboardProfile() {
 
   const [editing, setEditing] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [errors, setErrors] = useState({})
   const [newPhone, setNewPhone] = useState('')
   const [phoneError, setPhoneError] = useState('')
@@ -91,16 +92,16 @@ export default function DashboardProfile() {
     document.title = isDoctor ? 'BloodConnector — Doctor Profile' : 'BloodConnector — My Profile'
   }, [isDoctor])
 
-  const donations = Number(user.donationCount) || 12
-  const consultations = Number(user.consultations) || 48
+  const donations = Number(user.donationCount) || 0
+  const consultations = Number(user.consultations) || 0
   const lives = donations * 3
-  const patients = Math.max(consultations - 12, 36)
+  const patients = consultations
   const bloodLiters = `${(donations * 0.5).toFixed(donations % 2 ? 1 : 0)} L`
 
   const badges = isDoctor
     ? [
         ['bg-rose-100 text-brand', `Specialist ${form.specialization || 'General Physician'}`],
-        ['bg-emerald-100 text-emerald-700', `Exp: ${form.experience || 5} Years`],
+        ['bg-emerald-100 text-emerald-700', `Exp: ${form.experience || 0} Years`],
         ['bg-rose-50 text-brand', `${consultations} Consultations`],
       ]
     : [
@@ -112,7 +113,7 @@ export default function DashboardProfile() {
     ? [
         ['consult', String(consultations), 'Total Consultations'],
         ['pulse', String(patients), 'Patients Assisted'],
-        ['star', String(user.rating || '4.8'), 'Average Rating'],
+        ['star', String(user.rating || '—'), 'Average Rating'],
       ]
     : [
         ['calendar', String(donations), 'Total Donations'],
@@ -128,7 +129,7 @@ export default function DashboardProfile() {
     setErrors((current) => ({ ...current, [name]: '' }))
   }
 
-  function handleSave(event) {
+  async function handleSave(event) {
     event.preventDefault()
     const nextErrors = {
       name: validateFullName(form.name),
@@ -145,25 +146,31 @@ export default function DashboardProfile() {
       return
     }
 
-    updateUser({
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-      emailOrPhone: form.email.trim() || form.phone.trim() || user.emailOrPhone,
-      bloodGroup: form.bloodGroup,
-      address: form.address.trim(),
-      age: form.age,
-      weight: form.weight,
-      emergencyContact: form.emergencyContact,
-      medicalConditions: form.medicalConditions,
-      specialization: form.specialization,
-      registration: form.registration,
-      hospital: form.hospital,
-      experience: form.experience,
-      bio: form.bio,
-    })
-    setEditing(false)
-    setSaved(true)
+    try {
+      await updateUser({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        emailOrPhone: form.email.trim() || form.phone.trim() || user.emailOrPhone,
+        bloodGroup: form.bloodGroup,
+        address: form.address.trim(),
+        age: form.age,
+        weight: form.weight,
+        emergencyContact: form.emergencyContact,
+        medicalConditions: form.medicalConditions,
+        specialization: form.specialization,
+        registration: form.registration,
+        hospital: form.hospital,
+        experience: form.experience,
+        bio: form.bio,
+      })
+      setSaveError('')
+      setEditing(false)
+      setSaved(true)
+    } catch (error) {
+      setSaved(false)
+      setSaveError(error.message || 'Could not save your profile.')
+    }
   }
 
   function cancelEdit() {
@@ -250,7 +257,7 @@ export default function DashboardProfile() {
               {isDoctor ? 'Doctor' : 'Blood Donor'} • Member since {joined}
             </p>
             <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
-              {!isDoctor ? <BloodTypeBadge type={form.bloodGroup || 'O+'} size="lg" /> : null}
+              {!isDoctor && form.bloodGroup ? <BloodTypeBadge type={form.bloodGroup} size="lg" /> : null}
               {badges.map(([tone, label]) => (
                 <span key={label} className={`rounded-lg px-3 py-1.5 text-sm font-bold ${tone}`}>
                   {label}
@@ -354,6 +361,7 @@ export default function DashboardProfile() {
               />
             </Field>
           </div>
+          {saveError ? <p className="mt-4 mb-0 text-sm font-medium text-brand">{saveError}</p> : null}
           {saved ? <p className="mt-4 mb-0 text-sm font-medium text-emerald-600">Profile updated.</p> : null}
         </form>
 
@@ -441,10 +449,12 @@ export default function DashboardProfile() {
                   <button
                     type="button"
                     className={`${btnOutline} mt-4 h-9`}
-                    onClick={() => updateUser({
-                      ...markDonatedNow(),
-                      donationCount: donations + 1,
-                    })}
+                    onClick={() => {
+                      updateUser({
+                        ...markDonatedNow(),
+                        donationCount: donations + 1,
+                      }).catch(() => {})
+                    }}
                   >
                     I donated today
                   </button>

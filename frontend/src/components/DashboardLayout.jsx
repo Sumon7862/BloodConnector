@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Icon } from './DashIcons.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { openAdminApp } from '../lib/apps.js'
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
@@ -9,6 +10,7 @@ export default function DashboardLayout() {
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
   const isDoctor = user?.role === 'doctor'
+  const isAdmin = user?.role === 'admin'
 
   const links = [
     { to: '/dashboard', label: 'Overview', icon: 'home', end: true },
@@ -37,12 +39,17 @@ export default function DashboardLayout() {
     }
   }, [open])
 
+  if (isAdmin) {
+    if (!openAdminApp()) logout()
+    return null
+  }
+
   return (
-    <div className="lg:flex">
+    <div>
       {open ? (
         <button
           type="button"
-          className="fixed top-16 right-0 bottom-0 left-0 z-30 bg-slate-900/40 sm:top-18 lg:hidden"
+          className="fixed top-16 right-0 bottom-0 left-0 z-30 bg-slate-900/40 sm:top-[72px] lg:hidden"
           aria-label="Close menu"
           onClick={() => setOpen(false)}
         />
@@ -51,7 +58,7 @@ export default function DashboardLayout() {
       <aside
         className={`${
           open ? 'translate-x-0' : '-translate-x-full'
-        } fixed top-16 bottom-0 left-0 z-40 flex w-65 flex-col border-r border-slate-200 bg-white transition-transform sm:top-18 lg:sticky lg:top-18 lg:h-[calc(100svh-72px)] lg:translate-x-0 dark:border-slate-700 dark:bg-panel`}
+        } fixed top-16 bottom-0 left-0 z-40 flex w-65 flex-col overflow-hidden border-r border-slate-200 bg-white transition-transform sm:top-[72px] lg:translate-x-0 dark:border-slate-700 dark:bg-panel`}
       >
         <p className="px-5 pt-5 pb-2 text-[11px] font-bold tracking-[0.18em] text-slate-400 uppercase">
           {isDoctor ? 'Doctor desk' : 'Donor desk'}
@@ -89,7 +96,7 @@ export default function DashboardLayout() {
         </div>
       </aside>
 
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 lg:ml-65">
         <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 lg:hidden dark:border-slate-700 dark:bg-panel">
           <button
             type="button"

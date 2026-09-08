@@ -1,0 +1,38 @@
+export const SEED_BANKS = [
+  {
+    id: 'pathway',
+    name: 'Pathway Blood Care',
+    distance: '1.2 km',
+    phone: '+8801711001100',
+    map: 'https://maps.google.com/?q=Dhaka+Blood+Bank',
+    units: { 'A+': 16, 'B+': 11, 'AB+': 4, 'A-': 7, 'B-': 3, 'AB-': 2, 'O+': 21, 'O-': 6 },
+    hidden: false,
+  },
+  {
+    id: 'city',
+    name: 'City Life Blood Center',
+    distance: '2.8 km',
+    phone: '+8801812002200',
+    map: 'https://maps.google.com/?q=Dhaka+Medical',
+    units: { 'A+': 9, 'B+': 14, 'AB+': 5, 'A-': 2, 'B-': 8, 'AB-': 1, 'O+': 18, 'O-': 4 },
+    hidden: false,
+  },
+  {
+    id: 'square',
+    name: 'Square Hospital Blood Bank',
+    distance: '4.1 km',
+    phone: '+8801913003300',
+    map: 'https://maps.google.com/?q=Square+Hospital+Dhaka',
+    units: { 'A+': 12, 'B+': 8, 'AB+': 3, 'A-': 5, 'B-': 4, 'AB-': 2, 'O+': 15, 'O-': 7 },
+    hidden: false,
+  },
+  {
+    id: 'dmc',
+    name: 'Dhaka Medical College Blood Bank',
+    distance: '5.6 km',
+    phone: '+8801714004400',
+    map: 'https://maps.google.com/?q=Dhaka+Medical+College',
+    units: { 'A+': 22, 'B+': 19, 'AB+': 6, 'A-': 9, 'B-': 6, 'AB-': 3, 'O+': 28, 'O-': 11 },
+    hidden: false,
+  },
+]

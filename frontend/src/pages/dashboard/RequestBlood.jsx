@@ -20,6 +20,7 @@ export default function RequestBlood() {
   const [saved, setSaved] = useState(false)
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const myId = userIdFrom(user)
   const mine = useMemo(
     () => sortRequests(requests.filter((item) => item.requesterId === myId)),
@@ -37,7 +38,7 @@ export default function RequestBlood() {
     setErrors((current) => ({ ...current, [name]: '' }))
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     const nextErrors = {
       bloodType: validateRequired(form.bloodType, 'Please select the required blood type.'),
@@ -53,17 +54,25 @@ export default function RequestBlood() {
       setSaved(false)
       return
     }
-    createBloodRequest(user, form)
-    setSaved(true)
-    setFormError('')
-    setErrors({})
-    setForm({
-      bloodType: '',
-      urgency: '',
-      location: user.address || '',
-      contact: user.phone || user.emailOrPhone || '',
-      details: '',
-    })
+    setSubmitting(true)
+    try {
+      await createBloodRequest(user, form)
+      setSaved(true)
+      setFormError('')
+      setErrors({})
+      setForm({
+        bloodType: '',
+        urgency: '',
+        location: user.address || '',
+        contact: user.phone || user.emailOrPhone || '',
+        details: '',
+      })
+    } catch (error) {
+      setSaved(false)
+      setFormError(error.message || 'Could not submit that request.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -135,8 +144,8 @@ export default function RequestBlood() {
         </div>
         {formError ? <p className="mt-4 mb-0 text-sm font-medium text-brand" role="alert">{formError}</p> : null}
         {saved ? <p className="mt-4 mb-0 text-sm font-medium text-emerald-600">Your request is live. Matching blood-group donors will see it on their dashboard.</p> : null}
-        <button type="submit" className={`${btnPrimary} mt-5`}>
-          Submit Blood Request
+        <button type="submit" className={`${btnPrimary} mt-5`} disabled={submitting}>
+          {submitting ? 'Submitting…' : 'Submit Blood Request'}
         </button>
       </form>
 

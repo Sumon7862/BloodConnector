@@ -37,8 +37,7 @@ export default function ForgotPasswordModal({ open, onClose }) {
     setConfirmError(nextConfirm)
     if (nextError || nextPass || nextConfirm) return
     setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    const result = resetPassword(contact, password)
+    const result = await resetPassword(contact, password)
     setLoading(false)
     if (!result.ok) {
       setError(result.error)

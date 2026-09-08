@@ -7,7 +7,6 @@ import { Icon } from '../../components/DashIcons.jsx'
 import { IconInput, IconSelect } from '../../components/IconField.jsx'
 import { btnOutline, cardClass } from '../../lib/classes.js'
 import { BLOOD_GROUPS, validateEmail, validateFullName, validatePhone, validateRequired } from '../../utils/validation.js'
-import { SEED_FAMILY } from '../../data/dashboardData.js'
 import { loadFamily, loadFriends, removeKnownDonor, saveFamily } from '../../lib/people.js'
 import { parseEligibleAt } from '../../lib/eligibility.js'
 import { AvailabilityStatus } from '../../components/DonationCountdown.jsx'
@@ -23,8 +22,8 @@ const EMPTY_MEMBER = {
 
 export default function FamilyDonors() {
   const { user } = useAuth()
-  const [friends, setFriends] = useState(() => loadFriends(user))
-  const [family, setFamily] = useState(() => loadFamily(user, SEED_FAMILY))
+  const [friends, setFriends] = useState([])
+  const [family, setFamily] = useState([])
   const [adding, setAdding] = useState(false)
   const [member, setMember] = useState(EMPTY_MEMBER)
   const [memberError, setMemberError] = useState('')
@@ -33,9 +32,20 @@ export default function FamilyDonors() {
     document.title = 'BloodConnector — Family & Donors'
   }, [])
 
-  function persistFamily(next) {
+  useEffect(() => {
+    let cancelled = false
+    loadFriends().then((list) => { if (!cancelled) setFriends(list) })
+    loadFamily().then((list) => { if (!cancelled) setFamily(Array.isArray(list) ? list : []) })
+    return () => { cancelled = true }
+  }, [user?.id])
+
+  async function persistFamily(next) {
     setFamily(next)
-    saveFamily(user, next)
+    try {
+      await saveFamily(user, next)
+    } catch {
+      /* keep local view */
+    }
   }
 
   function addMember(event) {
@@ -129,7 +139,13 @@ export default function FamilyDonors() {
                     type="button"
                     className="text-slate-400 hover:text-brand"
                     aria-label={`Remove ${person.name}`}
-                    onClick={() => setFriends(removeKnownDonor(user, person.id))}
+                    onClick={async () => {
+                      try {
+                        setFriends(await removeKnownDonor(user, person.id))
+                      } catch {
+                        /* keep current list */
+                      }
+                    }}
                   >
                     <Icon name="trash" />
                   </button>

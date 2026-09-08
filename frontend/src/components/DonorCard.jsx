@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import DonorAvatar from './DonorAvatar.jsx'
 import { btnOutline, cardClass, cardHover } from '../lib/classes.js'
@@ -11,20 +11,36 @@ export default function DonorCard({ donor }) {
   const { user, isLoggedIn } = useAuth()
   const navigate = useNavigate()
   const person = useMemo(() => toDirectoryPerson(donor), [donor])
-  const [added, setAdded] = useState(() => (user ? loadFriends(user).some((item) => item.id === person.id) : false))
+  const [added, setAdded] = useState(false)
 
-  function handleAdd() {
+  useEffect(() => {
+    if (!user) {
+      setAdded(false)
+      return undefined
+    }
+    let cancelled = false
+    loadFriends().then((list) => {
+      if (!cancelled) setAdded(list.some((item) => item.id === person.id))
+    })
+    return () => { cancelled = true }
+  }, [user, person.id])
+
+  async function handleAdd() {
     if (!isLoggedIn) {
       navigate('/login')
       return
     }
-    if (added) {
-      setAdded(false)
-      removeKnownDonor(user, person.id)
-      return
+    try {
+      if (added) {
+        await removeKnownDonor(user, person.id)
+        setAdded(false)
+        return
+      }
+      await addKnownDonor(user, person)
+      setAdded(true)
+    } catch {
+      /* keep current button state */
     }
-    addKnownDonor(user, person)
-    setAdded(true)
   }
 
   return (

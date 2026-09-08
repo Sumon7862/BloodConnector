@@ -11,12 +11,11 @@ import SectionHeader from '../components/SectionHeader.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import {
   BLOOD_TYPES,
-  BLOOD_BANKS,
   HOME_STATS,
   HOW_IT_WORKS,
 } from '../data/homeData.js'
-import { DONORS } from '../data/donors.js'
-import { DOCTORS } from '../data/doctors.js'
+import { fetchBanks, fetchDonors } from '../lib/directory.js'
+import { fetchDoctors } from '../data/doctors.js'
 import { btnOutline, cardClass, inputClass, pageWidth } from '../lib/classes.js'
 import { filterDonors } from '../lib/donorsFilter.js'
 import { openRequests, useRequests } from '../lib/requests.js'
@@ -33,9 +32,20 @@ export default function Home() {
     bloodType: params.get('bloodType') || '',
   }))
   const [showAllBanks, setShowAllBanks] = useState(false)
+  const [allDonors, setAllDonors] = useState([])
+  const [banks, setBanks] = useState([])
+  const [doctors, setDoctors] = useState([])
 
   useEffect(() => {
     document.title = 'BloodConnector'
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchDonors().then((list) => { if (!cancelled) setAllDonors(list) })
+    fetchBanks().then((list) => { if (!cancelled) setBanks(list) })
+    fetchDoctors().then((list) => { if (!cancelled) setDoctors(list) })
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
@@ -53,11 +63,11 @@ export default function Home() {
   }
 
   const donors = useMemo(
-    () => filterDonors(DONORS, { area: query.city, bloodType: query.bloodType }).slice(0, 3),
-    [query],
+    () => filterDonors(allDonors, { area: query.city, bloodType: query.bloodType }).slice(0, 3),
+    [query, allDonors],
   )
 
-  const visibleBanks = showAllBanks ? BLOOD_BANKS : BLOOD_BANKS.slice(0, 2)
+  const visibleBanks = showAllBanks ? banks : banks.slice(0, 2)
   const donorQuery = new URLSearchParams()
   if (query.city) donorQuery.set('area', query.city)
   if (query.bloodType) donorQuery.set('bloodType', query.bloodType)
@@ -267,14 +277,14 @@ export default function Home() {
                     }`}
                   >
                     <BloodTypeBadge type={type} size="sm" className="mx-auto" />
-                    <span className="mt-1 block text-xs text-slate-500">{bank.units[type]} Units</span>
+                    <span className="mt-1 block text-xs text-slate-500">{bank.units?.[type] ?? 0} Units</span>
                   </div>
                 ))}
               </div>
             </article>
           ))}
         </div>
-        {BLOOD_BANKS.length > 2 ? (
+        {banks.length > 2 ? (
           <div className="mt-6 flex justify-center">
             <button type="button" className={`${btnOutline} h-11 px-6`} onClick={() => setShowAllBanks((open) => !open)}>
               {showAllBanks ? 'Show fewer banks' : 'See more blood banks'}
@@ -290,7 +300,7 @@ export default function Home() {
           subtitle="Volunteer physicians on call for eligibility, recovery, and emergencies."
         />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {DOCTORS.map((doctor) => (
+          {doctors.map((doctor) => (
             <DoctorCard key={doctor.id} doctor={doctor} />
           ))}
         </div>

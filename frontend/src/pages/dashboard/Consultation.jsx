@@ -1,10 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import DashPageHead from '../../components/DashPageHead.jsx'
 import { Icon } from '../../components/DashIcons.jsx'
 import DoctorCard from '../../components/DoctorCard.jsx'
 import { cardClass } from '../../lib/classes.js'
-import { DOCTORS } from '../../data/doctors.js'
+import { fetchDoctors } from '../../data/doctors.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 
 const TYPES = [
@@ -16,9 +16,16 @@ const TYPES = [
 export default function Consultation() {
   const { user } = useAuth()
   const isDoctor = user?.role === 'doctor'
+  const [doctors, setDoctors] = useState([])
 
   useEffect(() => {
     document.title = 'BloodConnector — Consultation'
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchDoctors().then((list) => { if (!cancelled) setDoctors(list) })
+    return () => { cancelled = true }
   }, [])
 
   return (
@@ -67,7 +74,7 @@ export default function Consultation() {
 
       <h2 className="mt-8 mb-4 text-lg font-extrabold">{isDoctor ? 'Your colleagues' : 'Available doctors'}</h2>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {DOCTORS.map((doctor) => (
+        {doctors.map((doctor) => (
           <DoctorCard key={doctor.id} doctor={doctor} />
         ))}
       </div>

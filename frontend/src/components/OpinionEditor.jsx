@@ -1,24 +1,29 @@
 import { useEffect, useState } from 'react'
 import DonorAvatar from './DonorAvatar.jsx'
 import { deleteOpinion, findUserOpinion, formatOpinionDate, MAX_OPINION_CHARS, saveOpinion } from '../data/gallery.js'
-import { accountKey, roleLabel } from '../lib/user.js'
+import { roleLabel } from '../lib/user.js'
 import { btnOutline, btnPrimary, cardClass } from '../lib/classes.js'
 import { validateOpinion, validateRating } from '../utils/validation.js'
 
 export default function OpinionEditor({ user, inputClass, onSaved }) {
-  const userId = accountKey(user?.emailOrPhone)
-  const [mine, setMine] = useState(() => findUserOpinion(userId))
-  const [editing, setEditing] = useState(() => !findUserOpinion(userId))
-  const [rating, setRating] = useState(() => findUserOpinion(userId)?.rating || 5)
-  const [opinion, setOpinion] = useState(() => findUserOpinion(userId)?.opinion || '')
+  const [mine, setMine] = useState(null)
+  const [editing, setEditing] = useState(true)
+  const [rating, setRating] = useState(5)
+  const [opinion, setOpinion] = useState('')
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    const current = findUserOpinion(userId)
-    setMine(current)
-    if (!current) setEditing(true)
-  }, [userId])
+    let cancelled = false
+    findUserOpinion().then((current) => {
+      if (cancelled) return
+      setMine(current)
+      setRating(current?.rating || 5)
+      setOpinion(current?.opinion || '')
+      setEditing(!current)
+    })
+    return () => { cancelled = true }
+  }, [user?.id])
 
   function startEdit() {
     setOpinion(mine?.opinion || '')
@@ -28,7 +33,7 @@ export default function OpinionEditor({ user, inputClass, onSaved }) {
     setEditing(true)
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     const nextError = validateRating(rating) || validateOpinion(opinion, { maxChars: MAX_OPINION_CHARS })
     if (nextError) {
@@ -36,22 +41,20 @@ export default function OpinionEditor({ user, inputClass, onSaved }) {
       setError(nextError)
       return
     }
-    const nextList = saveOpinion({
-      userId,
-      name: user.name,
-      role: roleLabel(user.role),
-      location: user.address || '',
-      rating,
-      opinion: opinion.trim(),
-      photo: user.photo || '',
-      createdAt: mine?.createdAt || new Date().toISOString(),
-    })
-    const nextMine = findUserOpinion(userId)
-    setMine(nextMine)
-    setEditing(false)
-    setError('')
-    setSaved(true)
-    onSaved?.(nextList)
+    try {
+      const nextList = await saveOpinion({
+        rating,
+        opinion: opinion.trim(),
+      })
+      const nextMine = await findUserOpinion()
+      setMine(nextMine)
+      setEditing(false)
+      setError('')
+      setSaved(true)
+      onSaved?.(nextList)
+    } catch (err) {
+      setError(err.message || 'Could not save your opinion.')
+    }
   }
 
   return (
@@ -73,15 +76,19 @@ export default function OpinionEditor({ user, inputClass, onSaved }) {
               <button
                 type="button"
                 className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 px-4 text-[13px] font-bold text-slate-600 hover:border-brand hover:text-brand dark:border-slate-600 dark:text-slate-300"
-                onClick={() => {
-                  const nextList = deleteOpinion(userId)
-                  setMine(null)
-                  setOpinion('')
-                  setRating(5)
-                  setEditing(true)
-                  setSaved(false)
-                  setError('')
-                  onSaved?.(nextList)
+                onClick={async () => {
+                  try {
+                    const nextList = await deleteOpinion()
+                    setMine(null)
+                    setOpinion('')
+                    setRating(5)
+                    setEditing(true)
+                    setSaved(false)
+                    setError('')
+                    onSaved?.(nextList)
+                  } catch (err) {
+                    setError(err.message || 'Could not delete that opinion.')
+                  }
                 }}
               >
                 Delete

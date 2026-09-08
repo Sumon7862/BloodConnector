@@ -33,8 +33,8 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
   const isMatch = isLoggedIn && !isOwner && matchesBloodGroup(user?.bloodGroup, request.bloodType)
   const view = showResponses || isOwner ? 'owner' : mode
 
-  function handleContact() {
-    if (user) contactRequester(request.id, user)
+  async function handleContact() {
+    if (user) await contactRequester(request.id).catch(() => {})
   }
 
   return (
@@ -90,7 +90,7 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
           <button
             type="button"
             className={`${btnOutline} h-10 flex-1`}
-            onClick={() => dismissRequest(request.id, user)}
+            onClick={() => dismissRequest(request.id).catch(() => {})}
           >
             Cancel
           </button>
@@ -103,7 +103,11 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
             Your contact: {request.contact}
           </a>
           {request.status === 'open' ? (
-            <button type="button" className={`${btnOutline} h-10 px-4`} onClick={() => closeRequest(request.id, user)}>
+            <button
+              type="button"
+              className={`${btnOutline} h-10 px-4`}
+              onClick={() => closeRequest(request.id, user, 'filled').catch(() => {})}
+            >
               Mark as filled
             </button>
           ) : (
@@ -112,13 +116,13 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
         </div>
       ) : null}
 
-      {view === 'owner' && request.responses.length ? (
+      {view === 'owner' && (request.responses || []).length ? (
         <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-700">
           <p className="mt-0 mb-3 text-sm font-extrabold">
             {request.responses.length} matching donor {request.responses.length === 1 ? 'update' : 'updates'}
           </p>
           <ul className="m-0 list-none space-y-3 p-0">
-            {request.responses.map((offer) => (
+            {(request.responses || []).map((offer) => (
               <li key={offer.id} className="rounded-xl border border-slate-200 p-3 dark:border-slate-700">
                 <div className="flex items-start gap-3">
                   <DonorAvatar name={offer.donorName} photo={offer.donorPhoto} size="sm" />
@@ -140,14 +144,14 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
                     <button
                       type="button"
                       className="inline-flex h-9 items-center rounded-lg bg-brand px-3 text-sm font-bold text-white hover:bg-brand-hover"
-                      onClick={() => setResponseStatus(request.id, offer.id, 'accepted', user)}
+                      onClick={() => setResponseStatus(request.id, offer.id, 'accepted', user).catch(() => {})}
                     >
                       Accept
                     </button>
                     <button
                       type="button"
                       className={`${btnOutline} h-9`}
-                      onClick={() => setResponseStatus(request.id, offer.id, 'declined', user)}
+                      onClick={() => setResponseStatus(request.id, offer.id, 'declined', user).catch(() => {})}
                     >
                       Decline
                     </button>

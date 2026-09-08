@@ -26,14 +26,14 @@ export default function DashboardHome() {
 
   const metrics = isDoctor
     ? [
-        ['Consultations', user.consultations || 48, 'consult', 'Patients and donors you advised'],
-        ['Patients helped', 36, 'user', 'Emergency and recovery calls'],
-        ['Rating', '4.8', 'star', 'From member reviews'],
-        ['Experience', `${user.experience || 5} yrs`, 'clock', 'On the BloodConnector desk'],
+        ['Consultations', Number(user.consultations) || 0, 'consult', 'Patients and donors you advised'],
+        ['Patients helped', Number(user.consultations) || 0, 'user', 'Emergency and recovery calls'],
+        ['Rating', user.rating || '—', 'star', 'From member reviews'],
+        ['Experience', `${user.experience || 0} yrs`, 'clock', 'On the BloodConnector desk'],
       ]
     : [
-        ['Donations', user.donationCount || 12, 'heart', 'Lives tied to your units'],
-        ['Lives supported', 36, 'user', 'About 3 per donation'],
+        ['Donations', Number(user.donationCount) || 0, 'heart', 'Lives tied to your units'],
+        ['Lives supported', (Number(user.donationCount) || 0) * 3, 'user', 'About 3 per donation'],
         ['Next eligible', eligible ? 'Now' : 'Wait', 'clock', eligible ? 'Ready to donate' : 'Countdown below'],
         ['Blood group', user.bloodGroup || '—', 'drop', 'Used to match patient requests'],
       ]
@@ -84,10 +84,12 @@ export default function DashboardHome() {
             <button
               type="button"
               className={`${btnOutline} h-10`}
-              onClick={() => updateUser({
-                ...markDonatedNow(),
-                donationCount: (Number(user.donationCount) || 0) + 1,
-              })}
+              onClick={() => {
+                updateUser({
+                  ...markDonatedNow(),
+                  donationCount: (Number(user.donationCount) || 0) + 1,
+                }).catch(() => {})
+              }}
             >
               I donated today
             </button>

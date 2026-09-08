@@ -12,7 +12,13 @@ export function getInitials(name) {
 }
 
 export function roleLabel(role) {
-  return role === 'doctor' ? 'Doctor' : 'Donor'
+  if (role === 'doctor') return 'Doctor'
+  if (role === 'admin') return 'Admin'
+  return 'Donor'
+}
+
+export function homePath() {
+  return '/dashboard'
 }
 
 export function readImageFile(file) {

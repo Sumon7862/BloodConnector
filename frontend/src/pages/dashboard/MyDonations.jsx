@@ -40,10 +40,12 @@ export default function MyDonations() {
             <button
               type="button"
               className={`${btnOutline} h-10`}
-              onClick={() => updateUser({
-                ...markDonatedNow(),
-                donationCount: (Number(user.donationCount) || 0) + 1,
-              })}
+              onClick={() => {
+                updateUser({
+                  ...markDonatedNow(),
+                  donationCount: (Number(user.donationCount) || 0) + 1,
+                }).catch(() => {})
+              }}
             >
               I donated today
             </button>

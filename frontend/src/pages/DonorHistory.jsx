@@ -3,42 +3,54 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
 import DonorAvatar from '../components/DonorAvatar.jsx'
 import BloodTypeBadge from '../components/BloodTypeBadge.jsx'
-import { donationTypeClass, DONATION_TYPES, getDonor, getDonorStats } from '../data/donors.js'
+import { donationTypeClass, DONATION_TYPES, getDonorStats } from '../data/donors.js'
+import { fetchDonor } from '../lib/directory.js'
 import { btnOutline, cardClass, inputClass } from '../lib/classes.js'
 
 export default function DonorHistory() {
   const { id } = useParams()
-  const donor = getDonor(id)
+  const [donor, setDonor] = useState(null)
+  const [missing, setMissing] = useState(false)
   const [typeFilter, setTypeFilter] = useState('All Types')
   const [yearFilter, setYearFilter] = useState('All Years')
-  const [appointments, setAppointments] = useState(donor?.appointments || [])
+  const [appointments, setAppointments] = useState([])
   const [reminderSet, setReminderSet] = useState(false)
 
   useEffect(() => {
-    if (!donor) return
-    document.title = `BloodConnector — ${donor.name}`
-    setAppointments(donor.appointments || [])
-    setReminderSet(false)
-    setTypeFilter('All Types')
-    setYearFilter('All Years')
-  }, [donor])
+    let cancelled = false
+    fetchDonor(id).then((next) => {
+      if (cancelled) return
+      if (!next) {
+        setMissing(true)
+        return
+      }
+      setDonor(next)
+      document.title = `BloodConnector — ${next.name}`
+      setAppointments(next.appointments || [])
+      setReminderSet(false)
+      setTypeFilter('All Types')
+      setYearFilter('All Years')
+    })
+    return () => { cancelled = true }
+  }, [id])
 
   const stats = useMemo(() => (donor ? getDonorStats(donor) : null), [donor])
   const years = useMemo(() => {
     if (!donor) return []
-    return [...new Set(donor.donations.map((item) => item.date.slice(-4)))].sort((a, b) => b.localeCompare(a))
+    return [...new Set((donor.donations || []).map((item) => String(item.date || '').slice(-4)).filter(Boolean))].sort((a, b) => b.localeCompare(a))
   }, [donor])
 
   const donations = useMemo(() => {
     if (!donor) return []
-    return donor.donations.filter((item) => {
+    return (donor.donations || []).filter((item) => {
       const typeOk = typeFilter === 'All Types' || item.type === typeFilter
       const yearOk = yearFilter === 'All Years' || item.date.endsWith(yearFilter)
       return typeOk && yearOk
     })
   }, [donor, typeFilter, yearFilter])
 
-  if (!donor) return <Navigate to="/donors" replace />
+  if (missing) return <Navigate to="/donors" replace />
+  if (!donor) return null
 
   function exportHistory() {
     const header = ['ID', 'Type', 'Status', 'Date', 'Location', 'Amount (ml)', 'Recipient', 'Blood Bank']

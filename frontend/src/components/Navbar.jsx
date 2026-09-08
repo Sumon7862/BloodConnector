@@ -4,6 +4,7 @@ import BrandMark from './BrandMark.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { getInitials } from '../lib/user.js'
+import { openAdminApp } from '../lib/apps.js'
 
 const PRIMARY_LINKS = [
   { to: '/', label: 'Home', end: true },
@@ -98,7 +99,13 @@ export default function Navbar() {
                 type="button"
                 className="inline-flex items-center gap-2 rounded-full border border-rose-100 bg-white py-0.5 pr-2.5 pl-0.5 text-sm font-bold text-navy no-underline hover:border-brand dark:border-brand/30 dark:bg-panel dark:text-white"
                 aria-label="Open your dashboard"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => {
+                  if (user?.role === 'admin') {
+                    if (!openAdminApp()) navigate('/dashboard')
+                    return
+                  }
+                  navigate('/dashboard')
+                }}
               >
                 <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-brand text-xs font-extrabold text-white sm:h-10 sm:w-10">
                   {user?.photo ? (

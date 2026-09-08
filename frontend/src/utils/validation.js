@@ -35,7 +35,7 @@ export function validateFullName(value) {
   const trimmed = value.trim()
   if (!trimmed) return 'Full name is required'
   if (trimmed.length < 2) return 'Name must be at least 2 characters'
-  if (!/^[a-zA-Z][a-zA-Z .'-]*$/.test(trimmed)) return 'Enter a valid full name'
+  if (!/^[\p{L}][\p{L} .'-]*$/u.test(trimmed)) return 'Enter a valid full name'
   return ''
 }
 

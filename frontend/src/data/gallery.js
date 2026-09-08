@@ -1,3 +1,5 @@
+import { api } from '../lib/api.js'
+
 export const SEED_OPINIONS = [
   {
     id: 'seed-1',
@@ -67,50 +69,39 @@ export const SEED_OPINIONS = [
   },
 ]
 
-const STORAGE_KEY = 'bloodconnector-gallery'
 export const OPINIONS_EVENT = 'bloodconnector-opinions'
 export const MAX_OPINION_CHARS = 100
 
-function loadStored() {
+function emit() {
+  window.dispatchEvent(new Event(OPINIONS_EVENT))
+}
+
+export async function loadOpinions() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    const extra = raw ? JSON.parse(raw) : []
-    return Array.isArray(extra) ? extra : []
+    return await api('/opinions', { auth: false })
   } catch {
-    return []
+    return SEED_OPINIONS
   }
 }
 
-export function loadOpinions() {
-  return [...loadStored(), ...SEED_OPINIONS]
-}
-
-export function findUserOpinion(userId) {
-  if (!userId) return null
-  return loadStored().find((item) => item.userId === userId) || null
-}
-
-export function saveOpinion(opinion) {
-  const stored = loadStored()
-  const existing = stored.find((item) => item.userId && item.userId === opinion.userId)
-  const record = {
-    ...opinion,
-    id: existing?.id || opinion.id || crypto.randomUUID(),
-    createdAt: existing?.createdAt || opinion.createdAt || new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+export async function findUserOpinion() {
+  try {
+    return await api('/opinions/me')
+  } catch {
+    return null
   }
-  const next = [record, ...stored.filter((item) => item.userId !== opinion.userId)]
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-  window.dispatchEvent(new Event(OPINIONS_EVENT))
-  return loadOpinions()
 }
 
-export function deleteOpinion(userId) {
-  if (!userId) return loadOpinions()
-  const next = loadStored().filter((item) => item.userId !== userId)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-  window.dispatchEvent(new Event(OPINIONS_EVENT))
-  return loadOpinions()
+export async function saveOpinion(opinion) {
+  const list = await api('/opinions', { method: 'PUT', body: opinion })
+  emit()
+  return list
+}
+
+export async function deleteOpinion() {
+  const list = await api('/opinions', { method: 'DELETE' })
+  emit()
+  return list
 }
 
 export function formatOpinionDate(iso) {

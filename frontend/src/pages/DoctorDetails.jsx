@@ -2,44 +2,61 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
 import PageHero from '../components/PageHero.jsx'
-import { addDoctorReview, getDoctor, getDoctorReviews } from '../data/doctors.js'
+import { addDoctorReview, fetchDoctor, getDoctorReviews } from '../data/doctors.js'
 import { btnPrimary, cardClass, inputClass } from '../lib/classes.js'
 
 export default function DoctorDetails() {
   const { id } = useParams()
-  const doctor = getDoctor(id)
-  const [reviews, setReviews] = useState(() => (id ? getDoctorReviews(id) : []))
+  const [doctor, setDoctor] = useState(null)
+  const [missing, setMissing] = useState(false)
+  const [reviews, setReviews] = useState([])
   const [name, setName] = useState('')
   const [comment, setComment] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!doctor) return
-    document.title = `BloodConnector — ${doctor.name}`
-    setReviews(getDoctorReviews(doctor.id))
-    setName('')
-    setComment('')
-    setError('')
-  }, [doctor])
+    let cancelled = false
+    fetchDoctor(id).then((next) => {
+      if (cancelled) return
+      if (!next) {
+        setMissing(true)
+        return
+      }
+      setDoctor(next)
+      document.title = `BloodConnector — ${next.name}`
+      getDoctorReviews(next.id).then((list) => {
+        if (!cancelled) setReviews(list)
+      })
+      setName('')
+      setComment('')
+      setError('')
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [id])
 
-  if (!doctor) return <Navigate to="/doctors" replace />
+  if (missing) return <Navigate to="/doctors" replace />
+  if (!doctor) return null
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     if (!name.trim() || !comment.trim()) {
       setError('Please enter your name and comment.')
       return
     }
-    const next = addDoctorReview(doctor.id, {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      comment: comment.trim(),
-      createdAt: new Date().toISOString(),
-    })
-    setReviews(next)
-    setName('')
-    setComment('')
-    setError('')
+    try {
+      const next = await addDoctorReview(doctor.id, {
+        name: name.trim(),
+        comment: comment.trim(),
+      })
+      setReviews(next)
+      setName('')
+      setComment('')
+      setError('')
+    } catch (err) {
+      setError(err.message || 'Could not submit that review.')
+    }
   }
 
   return (

@@ -1,3 +1,5 @@
+import { api } from '../lib/api.js'
+
 export const DOCTOR_HERO_COPY =
   'Volunteer doctors support patients who need blood and donors who are about to give it. Call for eligibility, recovery, or emergency advice — at no charge.'
 
@@ -34,30 +36,34 @@ export const DOCTORS = [
   },
 ]
 
-const REVIEWS_KEY = 'bloodconnector-doctor-reviews'
-
 export function getDoctor(id) {
   return DOCTORS.find((doctor) => doctor.id === id)
 }
 
-export function getDoctorReviews(id) {
+export async function fetchDoctors() {
   try {
-    const all = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '{}')
-    return Array.isArray(all[id]) ? all[id] : []
+    return await api('/doctors', { auth: false })
+  } catch {
+    return DOCTORS
+  }
+}
+
+export async function fetchDoctor(id) {
+  try {
+    return await api(`/doctors/${encodeURIComponent(id)}`, { auth: false })
+  } catch {
+    return getDoctor(id) || null
+  }
+}
+
+export async function getDoctorReviews(id) {
+  try {
+    return await api(`/doctors/${encodeURIComponent(id)}/reviews`, { auth: false })
   } catch {
     return []
   }
 }
 
-export function addDoctorReview(id, review) {
-  const all = (() => {
-    try {
-      return JSON.parse(localStorage.getItem(REVIEWS_KEY) || '{}')
-    } catch {
-      return {}
-    }
-  })()
-  const next = [review, ...(Array.isArray(all[id]) ? all[id] : [])]
-  localStorage.setItem(REVIEWS_KEY, JSON.stringify({ ...all, [id]: next }))
-  return next
+export async function addDoctorReview(id, review) {
+  return api(`/doctors/${encodeURIComponent(id)}/reviews`, { method: 'POST', body: review, auth: false })
 }

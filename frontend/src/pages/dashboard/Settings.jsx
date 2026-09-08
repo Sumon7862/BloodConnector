@@ -48,7 +48,7 @@ export default function SettingsPage() {
     persistSettings({ ...settings, [key]: !settings[key] })
   }
 
-  function handlePassword(event) {
+  async function handlePassword(event) {
     event.preventDefault()
     const nextErrors = {
       current: hasPassword && !passwords.current ? 'Current password is required' : '',
@@ -57,7 +57,7 @@ export default function SettingsPage() {
     }
     setPassErrors(nextErrors)
     if (Object.values(nextErrors).some(Boolean)) return
-    const result = changePassword(passwords.current, passwords.next)
+    const result = await changePassword(passwords.current, passwords.next)
     if (!result.ok) {
       setPassErrors({ current: result.error })
       return

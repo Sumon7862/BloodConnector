@@ -6,7 +6,8 @@ import PasswordInput from '../components/PasswordInput.jsx'
 import BloodGroupSelect from '../components/BloodGroupSelect.jsx'
 import RoleSelect from '../components/RoleSelect.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { readImageFile } from '../lib/user.js'
+import { readImageFile, homePath } from '../lib/user.js'
+import { openAdminApp } from '../lib/apps.js'
 import {
   getPasswordStrength,
   validateAddress,
@@ -95,8 +96,7 @@ export default function SignUp() {
     if (!validateAll()) return
 
     setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const result = register({
+    const result = await register({
       fullName: values.fullName,
       emailOrPhone: values.emailOrPhone,
       role: values.role,
@@ -109,13 +109,20 @@ export default function SignUp() {
       phone: values.emailOrPhone.includes('@') ? '' : values.emailOrPhone,
     })
     setLoading(false)
+    if (result.adminRedirect) {
+      if (!openAdminApp()) {
+        setErrors((current) => ({ ...current, emailOrPhone: 'Use the admin panel to sign in.' }))
+        setTouched((current) => ({ ...current, emailOrPhone: true }))
+      }
+      return
+    }
     if (!result.ok) {
       setErrors((current) => ({ ...current, emailOrPhone: result.error }))
       setTouched((current) => ({ ...current, emailOrPhone: true }))
       return
     }
     const from = location.state?.from
-    navigate(typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : '/dashboard', { replace: true })
+    navigate(typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : homePath(result.user), { replace: true })
   }
 
   const passwordOk = values.password.length >= 8

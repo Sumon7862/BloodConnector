@@ -9,19 +9,29 @@ import { HighlightBloodTypes } from '../../components/BloodTypeBadge.jsx'
 
 export default function Notifications() {
   const { user } = useAuth()
-  const [notes, setNotes] = useState(() => loadNotifications(user?.emailOrPhone))
+  const [notes, setNotes] = useState([])
 
   useEffect(() => {
     document.title = 'BloodConnector — Notifications'
   }, [])
 
   useEffect(() => {
-    setNotes(loadNotifications(user?.emailOrPhone))
-  }, [user?.emailOrPhone])
+    let cancelled = false
+    loadNotifications().then((list) => {
+      if (!cancelled) setNotes(list)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [user?.id])
 
-  function persist(next) {
+  async function persist(next) {
     setNotes(next)
-    saveNotifications(user.emailOrPhone, next)
+    try {
+      await saveNotifications(next)
+    } catch {
+      /* keep local view */
+    }
   }
 
   return (

@@ -1,46 +1,13 @@
-import { accountKey } from './user.js'
-import { DEFAULT_NOTIFICATIONS } from '../data/dashboardData.js'
+import { api } from './api.js'
 
-const LEGACY_KEY = 'bloodconnector-notifications'
-
-function notesKey(emailOrPhone) {
-  return `bloodconnector-notifications:${accountKey(emailOrPhone)}`
-}
-
-export function loadNotifications(emailOrPhone) {
-  if (!emailOrPhone) return []
+export async function loadNotifications() {
   try {
-    const raw = localStorage.getItem(notesKey(emailOrPhone))
-    if (raw) {
-      const parsed = JSON.parse(raw)
-      return Array.isArray(parsed) ? parsed : DEFAULT_NOTIFICATIONS
-    }
+    return await api('/notifications')
   } catch {
-    /* fall through */
-  }
-  return DEFAULT_NOTIFICATIONS
-}
-
-export function saveNotifications(emailOrPhone, notes) {
-  localStorage.setItem(notesKey(emailOrPhone), JSON.stringify(notes))
-  try {
-    localStorage.removeItem(LEGACY_KEY)
-  } catch {
-    /* ignore */
+    return []
   }
 }
 
-export function pushNotification(emailOrPhone, note) {
-  if (!emailOrPhone) return
-  const next = [
-    {
-      id: crypto.randomUUID(),
-      unread: true,
-      time: 'Just now',
-      tone: 'drop',
-      ...note,
-    },
-    ...loadNotifications(emailOrPhone),
-  ]
-  saveNotifications(emailOrPhone, next)
+export async function saveNotifications(notes) {
+  return api('/notifications', { method: 'PUT', body: notes })
 }
