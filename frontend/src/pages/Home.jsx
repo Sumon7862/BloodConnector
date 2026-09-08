@@ -42,7 +42,7 @@ export default function Home() {
   ]
 
   useEffect(() => {
-    document.title = 'BloodConnector — Find blood donors and volunteer doctors'
+    document.title = 'BloodConnector'
   }, [])
 
   useEffect(() => {
@@ -82,6 +82,8 @@ export default function Home() {
     <Layout>
       <section className="relative overflow-hidden bg-navy text-white">
         <img
+          src="https://images.unsplash.com/photo-1615461066841-6116ee365664?auto=format&fit=crop&w=1800&q=80"
+          alt=""
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(11,36,71,0.95)_0%,rgba(11,36,71,0.82)_50%,rgba(225,29,45,0.72)_100%)]" />

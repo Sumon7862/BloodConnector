@@ -4,3 +4,5 @@ Disallow: /dashboard
 Disallow: /login
 Disallow: /signup
 Disallow: /profile
+
+Sitemap: https://blood-connector-lake.vercel.app/sitemap.xml
