@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", "Noto Sans Bengali", system-ui, "Segoe UI", Roboto, sans-serif;
+  --color-brand: #e11d2d;
+  --color-brand-hover: #be123c;
+  --color-brand-pressed: #9f1239;
+  --color-navy: #0b2447;
+  --color-ink: #0b0d12;
+  --color-panel: #151922;
+  --color-panel-2: #1b2130;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+#app {
+  min-height: 100%;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+}
