@@ -34,7 +34,7 @@ const INITIAL = {
 
 export default function SignUp() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { register } = useAuth()
   const [values, setValues] = useState(INITIAL)
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
@@ -95,7 +95,7 @@ export default function SignUp() {
 
     setLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    login({
+    const result = register({
       fullName: values.fullName,
       emailOrPhone: values.emailOrPhone,
       role: values.role,
@@ -103,9 +103,17 @@ export default function SignUp() {
       photo: values.photo,
       bloodGroup: values.bloodGroup,
       age: values.age,
+      password: values.password,
+      email: values.emailOrPhone.includes('@') ? values.emailOrPhone : '',
+      phone: values.emailOrPhone.includes('@') ? '' : values.emailOrPhone,
     })
     setLoading(false)
-    navigate('/', { replace: true })
+    if (!result.ok) {
+      setErrors((current) => ({ ...current, emailOrPhone: result.error }))
+      setTouched((current) => ({ ...current, emailOrPhone: true }))
+      return
+    }
+    navigate('/dashboard', { replace: true })
   }
 
   const passwordOk = values.password.length >= 8

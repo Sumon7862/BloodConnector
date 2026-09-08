@@ -1,6 +1,9 @@
 export const inputClass =
   'h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-brand/40 focus:border-brand focus:ring-4 focus:ring-brand/20 dark:border-slate-600 dark:bg-panel-2 dark:text-slate-100 dark:placeholder:text-slate-500'
 
+export const dashInput =
+  'h-11 w-full rounded-lg border border-slate-200 bg-zinc-50 px-3.5 text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-brand/40 focus:border-brand focus:bg-white focus:ring-4 focus:ring-brand/20 dark:border-slate-600 dark:bg-panel-2 dark:text-slate-100 dark:placeholder:text-slate-500'
+
 export const btnPrimary =
   'inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand font-bold text-white shadow-[0_8px_18px_rgba(225,29,45,0.28)] transition hover:bg-brand-hover disabled:cursor-wait disabled:opacity-70'
 

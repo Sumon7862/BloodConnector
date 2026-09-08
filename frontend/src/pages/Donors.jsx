@@ -8,9 +8,11 @@ import { inputClass } from '../lib/classes.js'
 
 export default function Donors() {
   const [params, setParams] = useSearchParams()
+  const [name, setName] = useState(() => params.get('q') || '')
   const [area, setArea] = useState(() => params.get('area') || params.get('city') || '')
   const [bloodType, setBloodType] = useState(() => params.get('bloodType') || '')
   const [query, setQuery] = useState(() => ({
+    name: params.get('q') || '',
     area: params.get('area') || params.get('city') || '',
     bloodType: params.get('bloodType') || '',
   }))
@@ -20,39 +22,49 @@ export default function Donors() {
   }, [])
 
   useEffect(() => {
+    const nextName = params.get('q') || ''
     const nextArea = params.get('area') || params.get('city') || ''
     const nextType = params.get('bloodType') || ''
+    setName(nextName)
     setArea(nextArea)
     setBloodType(nextType)
-    setQuery({ area: nextArea, bloodType: nextType })
+    setQuery({ name: nextName, area: nextArea, bloodType: nextType })
   }, [params])
 
   function handleSearch(event) {
     event.preventDefault()
-    const next = { area: area.trim(), bloodType }
+    const next = { name: name.trim(), area: area.trim(), bloodType }
     setQuery(next)
     const nextParams = new URLSearchParams()
+    if (next.name) nextParams.set('q', next.name)
     if (next.area) nextParams.set('area', next.area)
     if (next.bloodType) nextParams.set('bloodType', next.bloodType)
     setParams(nextParams, { replace: true })
   }
 
   const donors = useMemo(() => {
+    const nameValue = query.name.toLowerCase()
+    const nameDigits = nameValue.replace(/\D/g, '')
     const areaValue = query.area.toLowerCase()
     return DONORS.filter((donor) => {
+      const nameOk =
+        !nameValue ||
+        donor.name.toLowerCase().includes(nameValue) ||
+        donor.location.toLowerCase().includes(nameValue) ||
+        (nameDigits.length >= 3 && donor.phone.replace(/\D/g, '').includes(nameDigits))
       const areaOk =
         !areaValue ||
         donor.area.toLowerCase().includes(areaValue) ||
         donor.location.toLowerCase().includes(areaValue)
       const typeOk = !query.bloodType || donor.bloodType === query.bloodType
-      return areaOk && typeOk
+      return nameOk && areaOk && typeOk
     })
   }, [query])
 
   const headingType = query.bloodType
   const heading = headingType
-    ? `See All Active ${headingType} Donor Near You`
-    : 'See All Active Donors Near You'
+    ? `Available ${headingType} donors near you`
+    : 'Available donors near you'
 
   return (
     <Layout>
@@ -74,9 +86,18 @@ export default function Donors() {
           </h1>
 
           <form
-            className="mx-auto mt-8 grid w-full max-w-[760px] gap-2 rounded-xl bg-white p-2 shadow-lg sm:grid-cols-[1.2fr_0.8fr_auto] dark:bg-panel"
+            className="mx-auto mt-8 grid w-full max-w-[920px] gap-2 rounded-xl bg-white p-2 shadow-lg sm:grid-cols-2 lg:grid-cols-[1.1fr_1fr_0.8fr_auto] dark:bg-panel"
             onSubmit={handleSearch}
           >
+            <label className="sr-only" htmlFor="donor-name">Name or phone</label>
+            <input
+              id="donor-name"
+              type="text"
+              placeholder="Name or phone of someone you know"
+              value={name}
+              className={`${inputClass} border-slate-200`}
+              onChange={(event) => setName(event.target.value)}
+            />
             <label className="sr-only" htmlFor="donor-area">Area</label>
             <input
               id="donor-area"

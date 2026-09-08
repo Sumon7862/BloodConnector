@@ -1,3 +1,7 @@
+export function accountKey(emailOrPhone) {
+  return String(emailOrPhone || '').trim().toLowerCase()
+}
+
 export function getInitials(name) {
   return String(name || 'U')
     .split(' ')

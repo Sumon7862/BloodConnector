@@ -63,7 +63,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-panel">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-panel">
       <div className="relative mx-auto flex min-h-16 w-[min(1180px,calc(100%-24px))] items-center gap-2 sm:min-h-[72px] sm:w-[min(1180px,calc(100%-32px))] sm:gap-4">
         <BrandMark className="min-w-0 shrink" />
 
@@ -95,8 +95,8 @@ export default function Navbar() {
             <button
               type="button"
               className="h-9 w-9 overflow-hidden rounded-full border-2 border-rose-100 bg-brand text-sm font-extrabold text-white shadow-[0_0_0_2px_#e11d2d] sm:h-10 sm:w-10 dark:border-brand/30"
-              aria-label="Open your profile"
-              onClick={() => navigate('/profile')}
+              aria-label="Open your dashboard"
+              onClick={() => navigate('/dashboard')}
             >
               {user?.photo ? (
                 <img src={user.photo} alt="" className="h-full w-full object-cover" />

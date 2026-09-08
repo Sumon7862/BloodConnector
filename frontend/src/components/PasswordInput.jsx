@@ -9,6 +9,7 @@ export default function PasswordInput({
   autoComplete,
   placeholder = '••••••••',
   invalid = false,
+  inputClassName = inputClass,
 }) {
   const [visible, setVisible] = useState(false)
   const fallbackId = useId()
@@ -25,7 +26,7 @@ export default function PasswordInput({
         autoComplete={autoComplete}
         placeholder={placeholder}
         spellCheck="false"
-        className={`${inputClass} pr-11 ${invalid ? 'border-brand' : ''}`}
+        className={`${inputClassName} pr-11 ${invalid ? 'border-brand' : ''}`}
       />
       <button
         type="button"

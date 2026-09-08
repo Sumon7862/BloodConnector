@@ -1,4 +1,4 @@
-export const BLOOD_TYPES = ['A+', 'B+', 'AB+', 'A-', 'B-', 'AB-', 'O+', 'O-']
+export const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
 export const BLOOD_BANKS = [
   {
@@ -17,38 +17,46 @@ export const BLOOD_BANKS = [
     map: 'https://maps.google.com/?q=Dhaka+Medical',
     units: { 'A+': 9, 'B+': 14, 'AB+': 5, 'A-': 2, 'B-': 8, 'AB-': 1, 'O+': 18, 'O-': 4 },
   },
+  {
+    id: 'square',
+    name: 'Square Hospital Blood Bank',
+    distance: '4.1 km',
+    phone: '+8801913003300',
+    map: 'https://maps.google.com/?q=Square+Hospital+Dhaka',
+    units: { 'A+': 12, 'B+': 8, 'AB+': 3, 'A-': 5, 'B-': 4, 'AB-': 2, 'O+': 15, 'O-': 7 },
+  },
+  {
+    id: 'dmc',
+    name: 'Dhaka Medical College Blood Bank',
+    distance: '5.6 km',
+    phone: '+8801714004400',
+    map: 'https://maps.google.com/?q=Dhaka+Medical+College',
+    units: { 'A+': 22, 'B+': 19, 'AB+': 6, 'A-': 9, 'B-': 6, 'AB-': 3, 'O+': 28, 'O-': 11 },
+  },
 ]
 
-export const RECENT_DONORS = [
+export const HOME_STATS = [
+  ['3,400+', 'Verified donors'],
+  ['12,000+', 'Lives supported'],
+  ['48', 'Partner blood banks'],
+  ['24/7', 'Doctor support'],
+]
+
+export const HOW_IT_WORKS = [
   {
-    id: 'd1',
-    name: 'Ayesha Rahman',
-    location: 'Dhanmondi, Dhaka',
-    bloodType: 'A+',
-    lastDonation: '1 week ago',
-    nextEligible: 'In 80 Days',
-    initials: 'AR',
-    tone: 'rose',
+    step: '1',
+    title: 'Search nearby',
+    copy: 'Find verified donors and live blood-bank units by area and blood type.',
   },
   {
-    id: 'd2',
-    name: 'Rahim Uddin',
-    location: 'Gulshan, Dhaka',
-    bloodType: 'O+',
-    lastDonation: '3 weeks ago',
-    nextEligible: 'In 62 Days',
-    initials: 'RU',
-    tone: 'navy',
+    step: '2',
+    title: 'Connect safely',
+    copy: 'Call, request, or add someone you know. Every profile is easy to reach.',
   },
   {
-    id: 'd3',
-    name: 'Nusrat Jahan',
-    location: 'Mirpur, Dhaka',
-    bloodType: 'B+',
-    lastDonation: '5 days ago',
-    nextEligible: 'In 85 Days',
-    initials: 'NJ',
-    tone: 'gold',
+    step: '3',
+    title: 'Donate and recover',
+    copy: 'Give blood, track your next eligible date, and get free medical advice.',
   },
 ]
 
@@ -57,15 +65,21 @@ export const IMPACT_CARDS = [
     id: 'drive',
     title: 'Host a Blood Drive',
     copy: 'Organize a drive at your campus, office, or community center.',
+    to: '/gallery',
+    action: 'See community stories',
   },
   {
     id: 'volunteer',
     title: 'Become a Volunteer',
-    copy: 'Help coordinate donors, campaigns, and emergency requests.',
+    copy: 'Help coordinate donors, requests, and emergency matching.',
+    to: '/signup',
+    action: 'Create an account',
   },
   {
     id: 'donate',
-    title: 'Make a Financial Donation',
-    copy: 'Support families who cannot afford emergency transfusion costs.',
+    title: 'Support the Mission',
+    copy: 'Learn how BloodConnector connects families during emergencies.',
+    to: '/about',
+    action: 'Read about us',
   },
 ]

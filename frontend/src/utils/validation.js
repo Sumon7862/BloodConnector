@@ -68,6 +68,14 @@ export function validateBloodGroup(value) {
   return ''
 }
 
+export function validatePhone(value, { required = true } = {}) {
+  const trimmed = String(value || '').trim()
+  if (!trimmed) return required ? 'Phone number is required' : ''
+  const digits = digitsOnly(trimmed)
+  if (digits.length < 10 || digits.length > 15) return 'Enter a valid phone number'
+  return ''
+}
+
 export function validatePassword(value, { required = true } = {}) {
   if (!value) return required ? 'Password is required' : ''
   if (value.length < 8) return 'Must be at least 8 characters'

@@ -16,6 +16,7 @@ export default function Login() {
   const { login } = useAuth()
   const [values, setValues] = useState(INITIAL)
   const [errors, setErrors] = useState({})
+  const [formError, setFormError] = useState('')
   const [touched, setTouched] = useState({})
   const [loading, setLoading] = useState(false)
   const [forgotOpen, setForgotOpen] = useState(false)
@@ -33,6 +34,7 @@ export default function Login() {
 
   function setField(name, value) {
     setValues((current) => ({ ...current, [name]: value }))
+    setFormError('')
     if (touched[name]) {
       setErrors((current) => ({ ...current, [name]: fieldError(name, value, values) }))
     }
@@ -59,12 +61,17 @@ export default function Login() {
 
     setLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 900))
-    login({
+    const result = login({
       name: values.emailOrPhone.includes('@') ? values.emailOrPhone.split('@')[0] : 'Member',
       emailOrPhone: values.emailOrPhone,
+      password: values.password,
     })
     setLoading(false)
-    navigate('/', { replace: true })
+    if (!result.ok) {
+      setFormError(result.error)
+      return
+    }
+    navigate('/dashboard', { replace: true })
   }
 
   return (
@@ -107,6 +114,7 @@ export default function Login() {
           {loading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" /> : null}
           {loading ? 'Logging in…' : 'Login'}
         </button>
+        {formError ? <p className="mt-3 mb-0 text-center text-sm font-medium text-brand">{formError}</p> : null}
 
         <p className="mt-[18px] text-center text-sm text-slate-500">
           Do not have an account? <Link to="/signup" className="font-bold text-brand no-underline hover:underline">Create Account</Link>

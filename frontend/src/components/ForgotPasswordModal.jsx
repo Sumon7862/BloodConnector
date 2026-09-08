@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react'
 import Field from './Field.jsx'
-import { validateEmail } from '../utils/validation.js'
+import PasswordInput from './PasswordInput.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { validateConfirmPassword, validateEmailOrPhone, validatePassword } from '../utils/validation.js'
 import { btnPrimary, inputClass } from '../lib/classes.js'
 
 export default function ForgotPasswordModal({ open, onClose }) {
-  const [email, setEmail] = useState('')
+  const { resetPassword } = useAuth()
+  const [contact, setContact] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
+  const [passError, setPassError] = useState('')
+  const [confirmError, setConfirmError] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -22,18 +29,31 @@ export default function ForgotPasswordModal({ open, onClose }) {
 
   async function handleSubmit(event) {
     event.preventDefault()
-    const nextError = validateEmail(email)
+    const nextError = validateEmailOrPhone(contact)
+    const nextPass = validatePassword(password)
+    const nextConfirm = validateConfirmPassword(password, confirm)
     setError(nextError)
-    if (nextError) return
+    setPassError(nextPass)
+    setConfirmError(nextConfirm)
+    if (nextError || nextPass || nextConfirm) return
     setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 800))
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    const result = resetPassword(contact, password)
     setLoading(false)
+    if (!result.ok) {
+      setError(result.error)
+      return
+    }
     setSubmitted(true)
   }
 
   function handleClose() {
-    setEmail('')
+    setContact('')
+    setPassword('')
+    setConfirm('')
     setError('')
+    setPassError('')
+    setConfirmError('')
     setSubmitted(false)
     setLoading(false)
     onClose()
@@ -50,9 +70,9 @@ export default function ForgotPasswordModal({ open, onClose }) {
       >
         {submitted ? (
           <>
-            <h2 id="forgot-title" className="m-0 text-[22px] font-bold">Check your inbox</h2>
+            <h2 id="forgot-title" className="m-0 text-[22px] font-bold">Password updated</h2>
             <p className="mt-2 mb-5 text-sm leading-relaxed text-slate-500">
-              If an account exists for {email.trim()}, you will receive a reset link shortly.
+              You can now login with the new password for {contact.trim()}.
             </p>
             <button type="button" className={btnPrimary} onClick={handleClose}>
               Back to login
@@ -62,20 +82,38 @@ export default function ForgotPasswordModal({ open, onClose }) {
           <form onSubmit={handleSubmit} noValidate>
             <h2 id="forgot-title" className="m-0 text-[22px] font-bold">Forgot password</h2>
             <p className="mt-2 mb-5 text-sm leading-relaxed text-slate-500">
-              Enter the email on your account and we will send a reset link.
+              Enter the email or phone on your account and choose a new password.
             </p>
-            <Field id="reset-email" label="Email" error={error}>
+            <Field id="reset-contact" label="Email or Phone" error={error}>
               <input
-                id="reset-email"
-                type="email"
-                autoComplete="email"
+                id="reset-contact"
+                type="text"
+                autoComplete="username"
                 placeholder="your.email@example.com"
-                value={email}
+                value={contact}
                 className={`${inputClass} ${error ? 'border-brand' : ''}`}
                 onChange={(event) => {
-                  setEmail(event.target.value)
-                  if (error) setError(validateEmail(event.target.value))
+                  setContact(event.target.value)
+                  if (error) setError(validateEmailOrPhone(event.target.value))
                 }}
+              />
+            </Field>
+            <Field id="reset-password" label="New password" error={passError}>
+              <PasswordInput
+                id="reset-password"
+                autoComplete="new-password"
+                invalid={Boolean(passError)}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </Field>
+            <Field id="reset-confirm" label="Confirm password" error={confirmError}>
+              <PasswordInput
+                id="reset-confirm"
+                autoComplete="new-password"
+                invalid={Boolean(confirmError)}
+                value={confirm}
+                onChange={(event) => setConfirm(event.target.value)}
               />
             </Field>
             <div className="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -83,7 +121,7 @@ export default function ForgotPasswordModal({ open, onClose }) {
                 Cancel
               </button>
               <button type="submit" className={`${btnPrimary} sm:w-auto sm:px-5`} disabled={loading}>
-                {loading ? 'Sending…' : 'Send reset link'}
+                {loading ? 'Saving…' : 'Update password'}
               </button>
             </div>
           </form>

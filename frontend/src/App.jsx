@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import Navbar from './components/Navbar.jsx'
+import DashboardLayout from './components/DashboardLayout.jsx'
 import Home from './pages/Home.jsx'
 import About from './pages/About.jsx'
 import Donors from './pages/Donors.jsx'
@@ -12,10 +13,20 @@ import Gallery from './pages/Gallery.jsx'
 import Login from './pages/Login.jsx'
 import SignUp from './pages/SignUp.jsx'
 import Profile from './pages/Profile.jsx'
+import DashboardHome from './pages/dashboard/DashboardHome.jsx'
+import RequestBlood from './pages/dashboard/RequestBlood.jsx'
+import MyDonations from './pages/dashboard/MyDonations.jsx'
+import DashboardGallery from './pages/dashboard/DashboardGallery.jsx'
+import BloodTypes from './pages/dashboard/BloodTypes.jsx'
+import Consultation from './pages/dashboard/Consultation.jsx'
+import DashboardProfile from './pages/dashboard/Profile.jsx'
+import FamilyDonors from './pages/dashboard/FamilyDonors.jsx'
+import Notifications from './pages/dashboard/Notifications.jsx'
+import SettingsPage from './pages/dashboard/Settings.jsx'
 
 function GuestOnly({ children }) {
   const { isLoggedIn } = useAuth()
-  if (isLoggedIn) return <Navigate to="/" replace />
+  if (isLoggedIn) return <Navigate to="/dashboard" replace />
   return children
 }
 
@@ -25,48 +36,66 @@ function RequireAuth({ children }) {
   return children
 }
 
+function AppRoutes() {
+  return (
+    <div className="min-h-svh overflow-x-hidden bg-zinc-100 text-slate-900 dark:bg-ink dark:text-slate-100">
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/donors" element={<Donors />} />
+        <Route path="/donors/:id" element={<DonorHistory />} />
+        <Route path="/doctors" element={<Doctors />} />
+        <Route path="/doctors/:id" element={<DoctorDetails />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route
+          path="/login"
+          element={
+            <GuestOnly>
+              <Login />
+            </GuestOnly>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <GuestOnly>
+              <SignUp />
+            </GuestOnly>
+          }
+        />
+        <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <DashboardLayout />
+            </RequireAuth>
+          }
+        >
+          <Route index element={<DashboardHome />} />
+          <Route path="profile" element={<DashboardProfile />} />
+          <Route path="people" element={<FamilyDonors />} />
+          <Route path="request-blood" element={<RequestBlood />} />
+          <Route path="donations" element={<MyDonations />} />
+          <Route path="gallery" element={<DashboardGallery />} />
+          <Route path="blood-types" element={<BloodTypes />} />
+          <Route path="consultation" element={<Consultation />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <div className="min-h-svh overflow-x-hidden bg-zinc-100 text-slate-900 dark:bg-ink dark:text-slate-100">
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/donors" element={<Donors />} />
-              <Route path="/donors/:id" element={<DonorHistory />} />
-              <Route path="/doctors" element={<Doctors />} />
-              <Route path="/doctors/:id" element={<DoctorDetails />} />
-              <Route path="/gallery" element={<Gallery />} />
-              <Route
-                path="/login"
-                element={
-                  <GuestOnly>
-                    <Login />
-                  </GuestOnly>
-                }
-              />
-              <Route
-                path="/signup"
-                element={
-                  <GuestOnly>
-                    <SignUp />
-                  </GuestOnly>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <RequireAuth>
-                    <Profile />
-                  </RequireAuth>
-                }
-              />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </div>
+          <AppRoutes />
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>

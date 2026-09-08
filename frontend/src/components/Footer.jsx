@@ -16,9 +16,9 @@ export default function Footer() {
           <h3 className="mb-3 text-base font-bold">Quick Links</h3>
           <ul className="m-0 list-none space-y-2 p-0 text-sm">
             <li><Link className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" to="/donors">Find Donors</Link></li>
-            <li><a className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" href="/#availability">Blood Banks</a></li>
+            <li><Link className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" to="/doctors">Free Doctor Service</Link></li>
             <li><Link className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" to="/gallery">Gallery</Link></li>
-            <li><a className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" href="/#doctors">FAQ</a></li>
+            <li><Link className="text-slate-500 no-underline hover:text-brand dark:text-slate-400" to="/about">About</Link></li>
           </ul>
         </div>
         <div>
@@ -36,6 +36,9 @@ export default function Footer() {
             <a className="text-inherit no-underline hover:text-brand" href="mailto:blood@gmail.com">blood@gmail.com</a>
           </p>
         </div>
+      </div>
+      <div className="border-t border-slate-200 py-4 text-center text-xs text-slate-400 dark:border-slate-700">
+        © {new Date().getFullYear()} BloodConnector. Connecting donors with those in need.
       </div>
     </footer>
   )

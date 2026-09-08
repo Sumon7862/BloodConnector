@@ -1,8 +1,31 @@
-import { Link } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import DonorAvatar from './DonorAvatar.jsx'
 import { btnOutline, cardClass } from '../lib/classes.js'
+import { useAuth } from '../context/AuthContext.jsx'
+import { addKnownDonor, loadFriends, removeKnownDonor, toDirectoryPerson } from '../lib/people.js'
+import { AvailabilityStatus } from './DonationCountdown.jsx'
 
 export default function DonorCard({ donor }) {
+  const { user, isLoggedIn } = useAuth()
+  const navigate = useNavigate()
+  const person = useMemo(() => toDirectoryPerson(donor), [donor])
+  const [added, setAdded] = useState(() => (user ? loadFriends(user).some((item) => item.id === person.id) : false))
+
+  function handleAdd() {
+    if (!isLoggedIn) {
+      navigate('/login')
+      return
+    }
+    if (added) {
+      setAdded(false)
+      removeKnownDonor(user, person.id)
+      return
+    }
+    addKnownDonor(user, person)
+    setAdded(true)
+  }
+
   return (
     <article className={`${cardClass} p-4 sm:p-5`}>
       <div className="flex items-start gap-3">
@@ -16,9 +39,8 @@ export default function DonorCard({ donor }) {
         </span>
       </div>
 
-      <div className="mt-4 mb-4 flex items-center justify-between text-sm">
-        <span className="text-slate-500">Status</span>
-        <span className="font-bold text-emerald-600 dark:text-emerald-400">{donor.status}</span>
+      <div className="mt-4 mb-4">
+        <AvailabilityStatus until={person.nextEligibleAt} />
       </div>
 
       <div className="grid grid-cols-2 gap-2">
@@ -32,6 +54,17 @@ export default function DonorCard({ donor }) {
           Donor History
         </Link>
       </div>
+      <button
+        type="button"
+        className={`mt-2 inline-flex h-10 w-full items-center justify-center rounded-lg text-sm font-bold ${
+          added
+            ? 'border border-brand bg-rose-50 text-brand dark:bg-brand/15'
+            : 'bg-brand text-white hover:bg-brand-hover'
+        }`}
+        onClick={handleAdd}
+      >
+        {isLoggedIn ? (added ? 'Added · Remove' : 'Add donor') : 'Login to add'}
+      </button>
     </article>
   )
 }
