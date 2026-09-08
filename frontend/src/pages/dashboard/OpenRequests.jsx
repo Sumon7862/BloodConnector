@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import DashPageHead from '../../components/DashPageHead.jsx'
 import RequestCard from '../../components/RequestCard.jsx'
+import BloodTypeBadge from '../../components/BloodTypeBadge.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { btnOutline } from '../../lib/classes.js'
 import { matchingRequestsFor, useRequests } from '../../lib/requests.js'
@@ -20,9 +21,13 @@ export default function OpenRequests() {
       <DashPageHead
         title="Matching Requests"
         subtitle={
-          user.bloodGroup
-            ? `Only ${user.bloodGroup} requests appear here. Contact the requester, or cancel if you cannot help.`
-            : 'Add your blood group in Profile to receive matching requests.'
+          user.bloodGroup ? (
+            <>
+              Only <BloodTypeBadge type={user.bloodGroup} size="sm" /> requests appear here. Contact the requester, or cancel if you cannot help.
+            </>
+          ) : (
+            'Add your blood group in Profile to receive matching requests.'
+          )
         }
         action={
           <Link to="/dashboard/request-blood" className={`${btnOutline} h-10 px-4 no-underline`}>
@@ -45,7 +50,7 @@ export default function OpenRequests() {
         </div>
       ) : (
         <p className="rounded-[14px] border border-slate-200 bg-white px-5 py-10 text-center text-slate-500 dark:border-slate-700 dark:bg-panel">
-          No open {user.bloodGroup} requests right now.
+          No open <BloodTypeBadge type={user.bloodGroup} size="sm" /> requests right now.
         </p>
       )}
     </div>

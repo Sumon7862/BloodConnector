@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
-import EmergencyDoctorHero from '../components/EmergencyDoctorHero.jsx'
+import PageHero from '../components/PageHero.jsx'
 import { addDoctorReview, getDoctor, getDoctorReviews } from '../data/doctors.js'
 import { btnPrimary, cardClass, inputClass } from '../lib/classes.js'
 
@@ -44,7 +44,9 @@ export default function DoctorDetails() {
 
   return (
     <Layout>
-      <EmergencyDoctorHero />
+      <PageHero eyebrow="Doctors" title={doctor.name}>
+        Volunteer care for patients waiting on blood and donors preparing to give.
+      </PageHero>
 
       <section className="mx-auto w-[min(760px,calc(100%-24px))] py-8 sm:w-[min(760px,calc(100%-32px))] sm:py-12">
         <article className={`${cardClass} px-5 py-8 text-center sm:px-10 sm:py-10`}>

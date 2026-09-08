@@ -7,17 +7,18 @@ import { getInitials } from '../lib/user.js'
 
 const PRIMARY_LINKS = [
   { to: '/', label: 'Home', end: true },
-  { to: '/about', label: 'About', end: true },
   { to: '/donors', label: 'Donors' },
-  { to: '/doctors', label: 'Free Doctor Service' },
+  { to: '/requests', label: 'Requests' },
+  { to: '/doctors', label: 'Doctors' },
   { to: '/gallery', label: 'Gallery' },
+  { to: '/about', label: 'About', end: true },
 ]
 
 function navClass(active) {
   return `inline-flex items-center gap-1 rounded-lg px-2.5 py-2 text-sm font-semibold no-underline transition ${
     active
       ? 'bg-rose-50 text-brand dark:bg-brand/15'
-      : 'text-slate-800 hover:bg-rose-50 hover:text-brand dark:text-slate-100 dark:hover:bg-brand/15'
+      : 'text-slate-700 hover:bg-rose-50 hover:text-brand dark:text-slate-200 dark:hover:bg-brand/15'
   }`
 }
 
@@ -63,66 +64,72 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-panel">
-      <div className="relative mx-auto flex min-h-16 w-[min(1180px,calc(100%-24px))] items-center gap-2 sm:min-h-[72px] sm:w-[min(1180px,calc(100%-32px))] sm:gap-4">
-        <BrandMark className="min-w-0 shrink" />
+    <>
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-700 dark:bg-panel/95">
+        <div className="relative mx-auto flex min-h-16 w-[min(1180px,calc(100%-24px))] items-center gap-2 sm:min-h-[72px] sm:w-[min(1180px,calc(100%-32px))] sm:gap-4">
+          <BrandMark className="min-w-0 shrink" />
 
-        <nav
-          className={`${
-            menuOpen ? 'flex' : 'hidden'
-          } absolute top-full right-0 left-0 z-40 max-h-[calc(100svh-4rem)] flex-col items-stretch gap-1 overflow-y-auto border-b border-slate-200 bg-white p-4 shadow-lg xl:static xl:z-auto xl:flex xl:max-h-none xl:flex-1 xl:flex-row xl:items-center xl:justify-center xl:gap-1 xl:overflow-visible xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none dark:border-slate-700 dark:bg-panel`}
-        >
-          {PRIMARY_LINKS.map((link) => (
-            <NavLink
-              key={link.label}
-              to={link.to}
-              end={link.end}
-              className={({ isActive }) => navClass(isActive)}
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </NavLink>
-          ))}
+          <nav
+            className={`${
+              menuOpen ? 'flex' : 'hidden'
+            } absolute top-full right-0 left-0 z-40 max-h-[calc(100svh-4rem)] flex-col items-stretch gap-1 overflow-y-auto border-b border-slate-200 bg-white p-4 shadow-lg xl:static xl:z-auto xl:flex xl:max-h-none xl:flex-1 xl:flex-row xl:items-center xl:justify-center xl:gap-1 xl:overflow-visible xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none dark:border-slate-700 dark:bg-panel`}
+          >
+            {PRIMARY_LINKS.map((link) => (
+              <NavLink
+                key={link.label}
+                to={link.to}
+                end={link.end}
+                className={({ isActive }) => navClass(isActive)}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </NavLink>
+            ))}
 
-          <div className="mt-3 border-t border-slate-200 pt-3 pb-[env(safe-area-inset-bottom)] xl:hidden dark:border-slate-700">
-            <AuthButtons />
-          </div>
-        </nav>
-
-        <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-2.5">
-          <ThemeToggle />
-          {isLoggedIn ? (
-            <button
-              type="button"
-              className="h-9 w-9 overflow-hidden rounded-full border-2 border-rose-100 bg-brand text-sm font-extrabold text-white shadow-[0_0_0_2px_#e11d2d] sm:h-10 sm:w-10 dark:border-brand/30"
-              aria-label="Open your dashboard"
-              onClick={() => navigate('/dashboard')}
-            >
-              {user?.photo ? (
-                <img src={user.photo} alt="" className="h-full w-full object-cover" />
-              ) : (
-                getInitials(user?.name)
-              )}
-            </button>
-          ) : (
-            <div className="hidden xl:block">
+            <div className="mt-3 border-t border-slate-200 pt-3 pb-[env(safe-area-inset-bottom)] xl:hidden dark:border-slate-700">
               <AuthButtons />
             </div>
-          )}
-        </div>
+          </nav>
 
-        <button
-          type="button"
-          className="inline-flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white xl:hidden dark:border-slate-600 dark:bg-panel"
-          aria-label="Toggle navigation"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <span className="block h-0.5 w-5 bg-slate-800 dark:bg-slate-100" />
-          <span className="block h-0.5 w-5 bg-slate-800 dark:bg-slate-100" />
-          <span className="block h-0.5 w-5 bg-slate-800 dark:bg-slate-100" />
-        </button>
-      </div>
-    </header>
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-2.5">
+            <ThemeToggle />
+            {isLoggedIn ? (
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full border border-rose-100 bg-white py-0.5 pr-2.5 pl-0.5 text-sm font-bold text-navy no-underline hover:border-brand dark:border-brand/30 dark:bg-panel dark:text-white"
+                aria-label="Open your dashboard"
+                onClick={() => navigate('/dashboard')}
+              >
+                <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-brand text-xs font-extrabold text-white sm:h-10 sm:w-10">
+                  {user?.photo ? (
+                    <img src={user.photo} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    getInitials(user?.name)
+                  )}
+                </span>
+                <span className="hidden pr-1 sm:inline">Dashboard</span>
+              </button>
+            ) : (
+              <div className="hidden xl:block">
+                <AuthButtons />
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white xl:hidden dark:border-slate-600 dark:bg-panel"
+            aria-label="Toggle navigation"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span className="block h-0.5 w-5 bg-slate-800 dark:bg-slate-100" />
+            <span className="block h-0.5 w-5 bg-slate-800 dark:bg-slate-100" />
+            <span className="block h-0.5 w-5 bg-slate-800 dark:bg-slate-100" />
+          </button>
+        </div>
+      </header>
+      <div className="h-16 sm:h-[72px]" aria-hidden="true" />
+    </>
   )
 }

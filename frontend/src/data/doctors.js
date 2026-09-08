@@ -1,5 +1,5 @@
 export const DOCTOR_HERO_COPY =
-  "Need urgent medical help? Our Emergency Doctors Service on Blood.com lets you talk to a doctor over the phone, anytime. Get quick advice and support when you need it most. We're here to help, you stay safe and healthy."
+  'Volunteer doctors support patients who need blood and donors who are about to give it. Call for eligibility, recovery, or emergency advice — at no charge.'
 
 export const DOCTORS = [
   {

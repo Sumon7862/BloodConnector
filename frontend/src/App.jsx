@@ -41,7 +41,7 @@ function RequireAuth({ children }) {
 
 function AppRoutes() {
   return (
-    <div className="min-h-svh overflow-x-hidden bg-zinc-100 text-slate-900 dark:bg-ink dark:text-slate-100">
+    <div className="min-h-svh overflow-x-hidden bg-zinc-50 text-slate-900 dark:bg-ink dark:text-slate-100">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />

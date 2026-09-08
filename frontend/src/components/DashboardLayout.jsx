@@ -11,20 +11,18 @@ export default function DashboardLayout() {
   const isDoctor = user?.role === 'doctor'
 
   const links = [
-    { to: '/dashboard', label: 'Dashboard', icon: 'home', end: true },
+    { to: '/dashboard', label: 'Overview', icon: 'home', end: true },
     { to: '/dashboard/profile', label: 'Profile', icon: 'user' },
-    { to: '/dashboard/people', label: 'Family & Donors', icon: 'people' },
     { to: '/dashboard/request-blood', label: 'Request Blood', icon: 'drop' },
     { to: '/dashboard/open-requests', label: 'Matching Requests', icon: 'alert' },
-    {
-      to: '/dashboard/donations',
-      label: isDoctor ? 'My Consultations' : 'My Donations',
-      icon: 'heart',
-    },
-    { to: '/dashboard/gallery', label: 'My Opinion', icon: 'gallery' },
-    { to: '/dashboard/blood-types', label: 'Blood Types', icon: 'types' },
-    { to: '/dashboard/consultation', label: 'Consultation', icon: 'consult' },
-    { to: '/dashboard/notifications', label: 'Notification', icon: 'bell' },
+    ...(!isDoctor
+      ? [
+          { to: '/dashboard/people', label: 'Family & Donors', icon: 'people' },
+          { to: '/dashboard/donations', label: 'My Donations', icon: 'heart' },
+        ]
+      : [{ to: '/dashboard/donations', label: 'My Consultations', icon: 'heart' }]),
+    { to: '/dashboard/consultation', label: isDoctor ? 'Consultation desk' : 'Consult a Doctor', icon: 'consult' },
+    { to: '/dashboard/notifications', label: 'Notifications', icon: 'bell' },
     { to: '/dashboard/settings', label: 'Settings', icon: 'gear' },
   ]
 
@@ -56,7 +54,7 @@ export default function DashboardLayout() {
         } fixed top-16 bottom-0 left-0 z-40 flex w-65 flex-col border-r border-slate-200 bg-white transition-transform sm:top-18 lg:sticky lg:top-18 lg:h-[calc(100svh-72px)] lg:translate-x-0 dark:border-slate-700 dark:bg-panel`}
       >
         <p className="px-5 pt-5 pb-2 text-[11px] font-bold tracking-[0.18em] text-slate-400 uppercase">
-          Main Menu
+          {isDoctor ? 'Doctor desk' : 'Donor desk'}
         </p>
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4">
           {links.map((link) => (
@@ -65,10 +63,10 @@ export default function DashboardLayout() {
               to={link.to}
               end={link.end}
               className={({ isActive }) =>
-                `inline-flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm no-underline transition ${
+                `inline-flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm no-underline transition ${
                   isActive
-                    ? 'bg-zinc-100 font-bold text-slate-900 dark:bg-brand/15 dark:text-white'
-                    : 'font-medium text-slate-500 hover:bg-zinc-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-panel-2 dark:hover:text-white'
+                    ? 'bg-rose-50 font-bold text-brand dark:bg-brand/15 dark:text-white'
+                    : 'font-medium text-slate-500 hover:bg-rose-50 hover:text-brand dark:text-slate-400 dark:hover:bg-brand/15 dark:hover:text-white'
                 }`
               }
             >
@@ -80,7 +78,7 @@ export default function DashboardLayout() {
         <div className="border-t border-slate-200 p-3 dark:border-slate-700">
           <button
             type="button"
-            className="inline-flex w-full items-center justify-center rounded-lg bg-brand px-3 py-2.5 text-sm font-bold text-white hover:bg-brand-hover"
+            className="inline-flex w-full items-center justify-center rounded-xl bg-brand px-3 py-2.5 text-sm font-bold text-white hover:bg-brand-hover"
             onClick={() => {
               logout()
               navigate('/', { replace: true })
@@ -95,7 +93,7 @@ export default function DashboardLayout() {
         <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 lg:hidden dark:border-slate-700 dark:bg-panel">
           <button
             type="button"
-            className="grid h-10 w-10 place-items-center rounded-lg border border-slate-200 dark:border-slate-600"
+            className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 dark:border-slate-600"
             aria-label="Open dashboard menu"
             onClick={() => setOpen(true)}
           >

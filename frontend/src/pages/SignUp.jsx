@@ -151,6 +151,9 @@ export default function SignUp() {
               setField('role', value)
             }}
           />
+          <p className="mt-2 mb-0 text-xs leading-relaxed text-slate-500">
+            Donors answer matching patient requests. Doctors advise donors and patients. Both can also request blood.
+          </p>
         </Field>
 
         <Field

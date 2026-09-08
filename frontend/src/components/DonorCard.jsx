@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import DonorAvatar from './DonorAvatar.jsx'
-import { btnOutline, cardClass } from '../lib/classes.js'
+import { btnOutline, cardClass, cardHover } from '../lib/classes.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { addKnownDonor, loadFriends, removeKnownDonor, toDirectoryPerson } from '../lib/people.js'
 import { AvailabilityStatus } from './DonationCountdown.jsx'
+import BloodTypeBadge from './BloodTypeBadge.jsx'
 
 export default function DonorCard({ donor }) {
   const { user, isLoggedIn } = useAuth()
@@ -27,16 +28,14 @@ export default function DonorCard({ donor }) {
   }
 
   return (
-    <article className={`${cardClass} p-4 sm:p-5`}>
+    <article className={`${cardClass} ${cardHover} p-4 sm:p-5`}>
       <div className="flex items-start gap-3">
         <DonorAvatar name={donor.name} photo={donor.photo} />
         <div className="min-w-0 flex-1">
           <h3 className="m-0 truncate text-base font-bold">{donor.name}</h3>
           <p className="mt-1 truncate text-[13px] text-slate-500 dark:text-slate-400">{donor.location}</p>
         </div>
-        <span className="shrink-0 rounded-md bg-brand px-2 py-1 text-[13px] font-extrabold text-white">
-          {donor.bloodType}
-        </span>
+        <BloodTypeBadge type={donor.bloodType} />
       </div>
 
       <div className="mt-4 mb-4">

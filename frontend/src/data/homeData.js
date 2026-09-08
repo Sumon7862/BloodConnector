@@ -45,17 +45,20 @@ export const HOME_STATS = [
 export const HOW_IT_WORKS = [
   {
     step: '1',
-    title: 'Search nearby',
-    copy: 'Find verified donors and live blood-bank units by area and blood type.',
+    kicker: 'Patients',
+    title: 'Ask for help',
+    copy: 'Create a blood request with your type and location. Matching donors are notified at once.',
   },
   {
     step: '2',
-    title: 'Connect safely',
-    copy: 'Call, request, or add someone you know. Every profile is easy to reach.',
+    kicker: 'Donors',
+    title: 'Answer the match',
+    copy: 'If the group matches yours, contact the patient or decline so the next donor can step in.',
   },
   {
     step: '3',
-    title: 'Donate and recover',
-    copy: 'Give blood, track your next eligible date, and get free medical advice.',
+    kicker: 'Doctors',
+    title: 'Keep everyone safe',
+    copy: 'Free consults for eligibility, recovery, and emergency advice — for donors and patients.',
   },
 ]

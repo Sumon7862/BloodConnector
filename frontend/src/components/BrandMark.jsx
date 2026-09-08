@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-export default function BrandMark({ size = 'md', to = '/', className = '' }) {
+export default function BrandMark({ size = 'md', to = '/', className = '', inverse = false }) {
   const stacked = size === 'lg'
   const content = (
     <span className={`inline-flex min-w-0 items-center gap-1.5 sm:gap-2 ${stacked ? 'flex-col gap-3' : ''}`}>
@@ -13,7 +13,7 @@ export default function BrandMark({ size = 'md', to = '/', className = '' }) {
       />
       <span className={`font-extrabold tracking-tight ${stacked ? 'text-[clamp(26px,7vw,32px)]' : 'text-[15px] sm:text-lg'}`}>
         <span className="text-brand">Blood</span>
-        <span className="text-navy dark:text-slate-300">Connector</span>
+        <span className={inverse ? 'text-white' : 'text-navy dark:text-slate-300'}>Connector</span>
       </span>
     </span>
   )

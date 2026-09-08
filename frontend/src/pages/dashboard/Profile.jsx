@@ -5,6 +5,7 @@ import { IconInput, IconSelect } from '../../components/IconField.jsx'
 import { btnOutline, cardClass, dashInput } from '../../lib/classes.js'
 import { readImageFile, roleLabel } from '../../lib/user.js'
 import DonationCountdown from '../../components/DonationCountdown.jsx'
+import BloodTypeBadge from '../../components/BloodTypeBadge.jsx'
 import { DONATION_WAIT_DAYS, isDonationEligible, markDonatedNow } from '../../lib/eligibility.js'
 import {
   BLOOD_GROUPS,
@@ -103,7 +104,6 @@ export default function DashboardProfile() {
         ['bg-rose-50 text-brand', `${consultations} Consultations`],
       ]
     : [
-        ['bg-rose-100 text-brand', `Blood type ${form.bloodGroup || 'O+'}`],
         ['bg-emerald-100 text-emerald-700', `${donations} donation`],
         ['bg-rose-50 text-brand', `${lives} Life saved`],
       ]
@@ -250,6 +250,7 @@ export default function DashboardProfile() {
               {isDoctor ? 'Doctor' : 'Blood Donor'} • Member since {joined}
             </p>
             <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
+              {!isDoctor ? <BloodTypeBadge type={form.bloodGroup || 'O+'} size="lg" /> : null}
               {badges.map(([tone, label]) => (
                 <span key={label} className={`rounded-lg px-3 py-1.5 text-sm font-bold ${tone}`}>
                   {label}

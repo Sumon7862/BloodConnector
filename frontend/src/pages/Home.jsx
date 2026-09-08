@@ -2,8 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
 import DonorCard from '../components/DonorCard.jsx'
+import DoctorCard from '../components/DoctorCard.jsx'
 import OpinionSlider from '../components/OpinionSlider.jsx'
 import RequestCard from '../components/RequestCard.jsx'
+import BloodTypeBadge from '../components/BloodTypeBadge.jsx'
+import NetworkRoles from '../components/NetworkRoles.jsx'
+import SectionHeader from '../components/SectionHeader.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import {
   BLOOD_TYPES,
@@ -12,7 +16,9 @@ import {
   HOW_IT_WORKS,
 } from '../data/homeData.js'
 import { DONORS } from '../data/donors.js'
-import { btnOutline, cardClass, inputClass } from '../lib/classes.js'
+import { DOCTORS } from '../data/doctors.js'
+import { btnOutline, cardClass, inputClass, pageWidth } from '../lib/classes.js'
+import { filterDonors } from '../lib/donorsFilter.js'
 import { openRequests, useRequests } from '../lib/requests.js'
 
 export default function Home() {
@@ -46,13 +52,10 @@ export default function Home() {
     document.getElementById('donors')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  const donors = useMemo(() => {
-    return DONORS.filter((donor) => {
-      const cityOk = !query.city || donor.location.toLowerCase().includes(query.city.toLowerCase())
-      const typeOk = !query.bloodType || donor.bloodType === query.bloodType
-      return cityOk && typeOk
-    }).slice(0, 3)
-  }, [query])
+  const donors = useMemo(
+    () => filterDonors(DONORS, { area: query.city, bloodType: query.bloodType }).slice(0, 3),
+    [query],
+  )
 
   const visibleBanks = showAllBanks ? BLOOD_BANKS : BLOOD_BANKS.slice(0, 2)
   const donorQuery = new URLSearchParams()
@@ -68,59 +71,66 @@ export default function Home() {
           alt="Medical staff preparing a blood donation"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(11,36,71,0.94)_0%,rgba(11,36,71,0.78)_48%,rgba(225,29,45,0.7)_100%)]" />
-        <div className="relative mx-auto grid w-[min(1180px,calc(100%-24px))] items-center gap-8 py-14 pb-24 sm:w-[min(1180px,calc(100%-32px))] sm:py-16 sm:pb-28 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12 lg:py-20">
+        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(11,36,71,0.95)_0%,rgba(11,36,71,0.82)_50%,rgba(225,29,45,0.72)_100%)]" />
+        <div className={`relative ${pageWidth} grid items-center gap-8 py-14 pb-24 sm:py-16 sm:pb-28 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12 lg:py-20`}>
           <div>
-            <p className="m-0 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold tracking-wide text-white uppercase">
-              Trusted blood donation network
+            <p className="m-0 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold tracking-[0.18em] text-white uppercase">
+              Patients · Donors · Doctors
             </p>
             <h1 className="mt-4 mb-0 max-w-3xl text-[clamp(32px,6vw,56px)] leading-[1.08] font-extrabold tracking-tight text-white">
-              Save lives through verified blood donation
+              One network when blood and care cannot wait
             </h1>
             <p className="mt-4 mb-0 max-w-xl text-base leading-relaxed text-white/90 sm:text-lg">
-              Find nearby donors, check live blood-bank units, and get free medical advice — all in one
-              place, when every minute matters.
+              Patients request, donors respond, doctors advise. Find a match, check live units, and get
+              free medical support in the same place.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
+                to={isLoggedIn ? '/dashboard/request-blood' : '/requests'}
+                className="inline-flex h-12 items-center justify-center rounded-xl bg-white px-6 font-extrabold text-brand no-underline hover:bg-rose-50"
+              >
+                I need blood
+              </Link>
+              <Link
                 to="/donors"
-                className="inline-flex h-12 items-center justify-center rounded-lg bg-white px-6 font-extrabold text-brand no-underline hover:bg-rose-50"
+                className="inline-flex h-12 items-center justify-center rounded-xl border border-white/40 px-6 font-extrabold text-white no-underline hover:bg-white/10"
               >
                 Find a donor
               </Link>
-              <Link
-                to={isLoggedIn ? '/dashboard' : '/signup'}
-                className="inline-flex h-12 items-center justify-center rounded-lg border border-white/40 px-6 font-extrabold text-white no-underline hover:bg-white/10"
-              >
-                {isLoggedIn ? 'Go to dashboard' : 'Become a donor'}
-              </Link>
             </div>
-            <ul className="mt-8 mb-0 flex list-none flex-wrap gap-x-5 gap-y-2 p-0 text-sm font-semibold text-white/80">
-              <li>3,400+ verified donors</li>
-              <li>48 partner banks</li>
-              <li>Free 24/7 doctor support</li>
-            </ul>
           </div>
 
           <aside className="rounded-2xl border border-white/20 bg-white/10 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)] backdrop-blur-md sm:p-6">
-            <p className="m-0 text-xs font-extrabold tracking-wide text-white/75 uppercase">Need blood now?</p>
-            <h2 className="mt-2 mb-1 text-xl font-extrabold text-white">Emergency matching</h2>
+            <p className="m-0 text-xs font-extrabold tracking-wide text-white/75 uppercase">Emergency</p>
+            <h2 className="mt-2 mb-1 text-xl font-extrabold text-white">Need help now?</h2>
             <p className="m-0 text-sm leading-relaxed text-white/85">
-              Call national emergency services, or jump to a blood type and search nearby donors.
+              Call 999, pick a blood group to search donors, or reach a volunteer doctor.
             </p>
-            <a
-              href="tel:999"
-              className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-lg bg-white font-extrabold text-brand no-underline hover:bg-rose-50"
-            >
-              Call 999
-            </a>
-            <p className="mt-5 mb-2 text-xs font-bold tracking-wide text-white/75 uppercase">Search by blood type</p>
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <a
+                href="tel:999"
+                className="inline-flex h-11 items-center justify-center rounded-xl bg-white font-extrabold text-brand no-underline hover:bg-rose-50"
+              >
+                Call 999
+              </a>
+              <Link
+                to="/doctors"
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-white/40 font-extrabold text-white no-underline hover:bg-white/10"
+              >
+                Call a doctor
+              </Link>
+            </div>
+            <p className="mt-5 mb-2 text-xs font-bold tracking-wide text-white/75 uppercase">Jump to a blood group</p>
             <div className="grid grid-cols-4 gap-2">
               {BLOOD_TYPES.map((type) => (
                 <button
                   key={type}
                   type="button"
-                  className="h-10 rounded-lg border border-white/25 bg-white/10 text-sm font-extrabold text-white transition hover:bg-white hover:text-brand"
+                  className={`h-10 rounded-md text-sm font-extrabold transition ${
+                    bloodType === type
+                      ? 'bg-white text-brand'
+                      : 'bg-brand text-white hover:bg-brand-hover'
+                  }`}
                   onClick={() => {
                     setBloodType(type)
                     document.getElementById('search')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -134,16 +144,18 @@ export default function Home() {
         </div>
       </section>
 
-      <div id="search" className="relative z-10 mx-auto -mt-16 w-[min(1180px,calc(100%-24px))] sm:w-[min(1180px,calc(100%-32px))]">
+      <div id="search" className={`relative z-10 ${pageWidth} -mt-16`}>
         <form className={`${cardClass} p-4 sm:p-6`} onSubmit={handleSearch}>
-          <h2 className="mb-1 text-lg font-extrabold sm:text-xl">Find blood donors near you</h2>
-          <p className="mt-0 mb-4 text-sm text-slate-500 dark:text-slate-400">Search by area and blood type to see matching donors below.</p>
+          <h2 className="mb-1 text-lg font-extrabold sm:text-xl">Find donors near you</h2>
+          <p className="mt-0 mb-4 text-sm text-slate-500 dark:text-slate-400">
+            Search by area and blood group. Availability is on every donor card.
+          </p>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[1.4fr_0.8fr_auto]">
             <label className="sr-only" htmlFor="search-city">City or area</label>
             <input
               id="search-city"
               type="text"
-              placeholder="Enter your city or area"
+              placeholder="City or area"
               value={city}
               className={inputClass}
               onChange={(event) => setCity(event.target.value)}
@@ -160,18 +172,14 @@ export default function Home() {
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>
-            <button type="submit" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand px-6 font-extrabold text-white hover:bg-brand-hover sm:col-span-2 xl:col-span-1 xl:w-auto">
-              <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current stroke-2" aria-hidden="true">
-                <circle cx="11" cy="11" r="7" />
-                <path d="M20 20l-3.2-3.2" />
-              </svg>
+            <button type="submit" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand px-6 font-extrabold text-white hover:bg-brand-hover sm:col-span-2 xl:col-span-1 xl:w-auto">
               Search
             </button>
           </div>
         </form>
       </div>
 
-      <section className="mx-auto w-[min(1180px,calc(100%-24px))] pt-10 sm:w-[min(1180px,calc(100%-32px))]">
+      <section className={`${pageWidth} pt-10`}>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {HOME_STATS.map(([value, label]) => (
             <article key={label} className={`${cardClass} px-4 py-5 text-center`}>
@@ -182,59 +190,65 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto w-[min(1180px,calc(100%-24px))] pt-14 sm:w-[min(1180px,calc(100%-32px))] sm:pt-16">
-        <header className="mb-8 text-center">
-          <h2 className="m-0 text-[clamp(24px,3vw,32px)] font-extrabold tracking-tight">How BloodConnector works</h2>
-          <p className="mt-2 mb-0 text-slate-500 dark:text-slate-400">Three clear steps from search to a safe donation.</p>
-        </header>
-        <div className="grid gap-4 md:grid-cols-3">
-          {HOW_IT_WORKS.map((item) => (
-            <article key={item.step} className={`${cardClass} p-5`}>
-              <p className="m-0 grid h-10 w-10 place-items-center rounded-full bg-brand text-sm font-extrabold text-white">
-                {item.step}
-              </p>
-              <h3 className="mt-4 mb-2 text-lg font-extrabold">{item.title}</h3>
-              <p className="m-0 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{item.copy}</p>
-            </article>
-          ))}
-        </div>
+      <section className={`${pageWidth} pt-14 sm:pt-16`}>
+        <SectionHeader
+          eyebrow="The network"
+          title="Everyone has a role that saves a life"
+          subtitle="Patients ask. Donors give. Doctors keep the process safe."
+        />
+        <NetworkRoles />
       </section>
 
       {urgent.length ? (
-        <section className="mx-auto w-[min(1180px,calc(100%-24px))] pt-14 sm:w-[min(1180px,calc(100%-32px))] sm:pt-16" id="requests">
-          <header className="mb-7 text-center">
-            <h2 className="m-0 text-[clamp(24px,3vw,32px)] font-extrabold tracking-tight">Urgent blood requests</h2>
-          <p className="mt-2 mb-0 text-slate-500 dark:text-slate-400">
-            Live requests from members. Matching blood-group donors get these on their dashboard.
-          </p>
-        </header>
-        <div className="grid gap-4 md:grid-cols-3">
-          {urgent.map((request) => (
-            <RequestCard key={request.id} request={request} mode="feed" />
-          ))}
-        </div>
+        <section className={`${pageWidth} pt-14 sm:pt-16`} id="requests">
+          <SectionHeader
+            eyebrow="Patients"
+            title="Urgent blood requests"
+            subtitle="Live asks from members. Matching donors get these on their dashboard."
+          />
+          <div className="grid gap-4 md:grid-cols-3">
+            {urgent.map((request) => (
+              <RequestCard key={request.id} request={request} mode="feed" />
+            ))}
+          </div>
           <div className="mt-6 flex justify-center">
             <Link to="/requests" className={`${btnOutline} h-11 px-6 no-underline`}>See all requests</Link>
           </div>
         </section>
       ) : null}
 
-      <section className="mx-auto w-[min(1180px,calc(100%-24px))] pt-14 pb-6 sm:w-[min(1180px,calc(100%-32px))] sm:pt-16" id="availability">
-        <header className="mb-7 text-center">
-          <h2 className="m-0 text-[clamp(24px,3vw,32px)] font-extrabold tracking-tight">Blood availability in your area</h2>
-          <p className="mt-2 mb-0 text-slate-500 dark:text-slate-400">
-            Live inventory from verified blood banks and hospitals near you.
-          </p>
-        </header>
+      <section className={`${pageWidth} pt-12 pb-6 sm:pt-16`} id="donors">
+        <SectionHeader
+          eyebrow="Donors"
+          title="Recent donors in your area"
+          subtitle="See who is available now, or how long until they can donate again."
+        />
+        {donors.length ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {donors.map((donor) => (
+              <DonorCard key={donor.id} donor={donor} />
+            ))}
+          </div>
+        ) : (
+          <p className={`${cardClass} px-5 py-10 text-center text-slate-500`}>No donors matched that area and blood type yet.</p>
+        )}
+        <div className="mt-6 flex justify-center">
+          <Link to={donorsHref} className={`${btnOutline} h-11 px-6 no-underline`}>See all donors</Link>
+        </div>
+      </section>
+
+      <section className={`${pageWidth} pt-14 pb-6 sm:pt-16`} id="availability">
+        <SectionHeader
+          eyebrow="Blood banks"
+          title="Units near you"
+          subtitle="If a donor is still waiting, check live inventory from partner hospitals."
+        />
         <div className="grid gap-4">
           {visibleBanks.map((bank) => (
             <article key={bank.id} className={`${cardClass} p-4 sm:p-5`}>
               <div className="mb-4 flex flex-col justify-between gap-3 sm:gap-4 md:flex-row md:items-start">
                 <div>
-                  <h3 className="m-0 flex items-center gap-2 text-base font-extrabold sm:text-lg">
-                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-brand shadow-[0_0_0_4px_rgba(225,29,45,0.15)]" aria-hidden="true" />
-                    {bank.name}
-                  </h3>
+                  <h3 className="m-0 text-base font-extrabold sm:text-lg">{bank.name}</h3>
                   <p className="mt-1 mb-0 text-sm text-slate-500">{bank.distance} away</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -246,13 +260,13 @@ export default function Home() {
                 {BLOOD_TYPES.map((type) => (
                   <div
                     key={type}
-                    className={`rounded-lg border px-1.5 py-2.5 text-center ${
+                    className={`rounded-xl border px-1.5 py-2.5 text-center ${
                       query.bloodType === type
                         ? 'border-brand bg-rose-50 dark:bg-brand/15'
                         : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-panel-2'
                     }`}
                   >
-                    <strong className="block text-[15px] text-brand">{type}</strong>
+                    <BloodTypeBadge type={type} size="sm" className="mx-auto" />
                     <span className="mt-1 block text-xs text-slate-500">{bank.units[type]} Units</span>
                   </div>
                 ))}
@@ -269,59 +283,43 @@ export default function Home() {
         ) : null}
       </section>
 
-      <section className="mx-auto w-[min(1180px,calc(100%-24px))] pt-12 pb-6 sm:w-[min(1180px,calc(100%-32px))] sm:pt-16" id="donors">
-        <header className="mb-7 text-center">
-          <h2 className="m-0 text-[clamp(24px,3vw,32px)] font-extrabold tracking-tight">Recent donors in your area</h2>
-          <p className="mt-2 mb-0 text-slate-500 dark:text-slate-400">
-            See who is available now, or how long until they can donate again.
-          </p>
-        </header>
-        {donors.length ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {donors.map((donor) => (
-              <DonorCard key={donor.id} donor={donor} />
-            ))}
-          </div>
-        ) : (
-          <p className={`${cardClass} px-5 py-10 text-center text-slate-500`}>No donors matched that area and blood type yet.</p>
-        )}
+      <section className={`${pageWidth} pt-12 sm:pt-16`} id="doctors">
+        <SectionHeader
+          eyebrow="Doctors"
+          title="Free care for donors and patients"
+          subtitle="Volunteer physicians on call for eligibility, recovery, and emergencies."
+        />
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {DOCTORS.map((doctor) => (
+            <DoctorCard key={doctor.id} doctor={doctor} />
+          ))}
+        </div>
         <div className="mt-6 flex justify-center">
-          <Link to={donorsHref} className={`${btnOutline} h-11 px-6 no-underline`}>See all donors</Link>
+          <Link to="/doctors" className={`${btnOutline} h-11 px-6 no-underline`}>See all doctors</Link>
+        </div>
+      </section>
+
+      <section className={`${pageWidth} pt-12 sm:pt-16`}>
+        <SectionHeader
+          eyebrow="How it works"
+          title="Three people. One outcome."
+          subtitle="A request, a match, and medical cover — without leaving BloodConnector."
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          {HOW_IT_WORKS.map((item) => (
+            <article key={item.step} className={`${cardClass} p-6`}>
+              <p className="m-0 text-[11px] font-bold tracking-[0.2em] text-brand uppercase">{item.kicker}</p>
+              <p className="mt-3 mb-0 grid h-10 w-10 place-items-center rounded-full bg-brand text-sm font-extrabold text-white">
+                {item.step}
+              </p>
+              <h3 className="mt-4 mb-2 text-lg font-extrabold">{item.title}</h3>
+              <p className="m-0 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{item.copy}</p>
+            </article>
+          ))}
         </div>
       </section>
 
       <OpinionSlider />
-
-      <section className="mx-auto w-[min(1180px,calc(100%-24px))] pt-12 pb-16 sm:w-[min(1180px,calc(100%-32px))] sm:pt-16" id="doctors">
-        <header className="mb-7 text-center">
-          <h2 className="m-0 text-[clamp(24px,3vw,32px)] font-extrabold tracking-tight">Free doctor service</h2>
-          <p className="mt-2 mb-0 text-slate-500 dark:text-slate-400">
-            Talk to licensed physicians about eligibility, recovery, and post-donation care.
-          </p>
-        </header>
-        <div className={`${cardClass} overflow-hidden md:grid md:grid-cols-[0.9fr_1.1fr]`}>
-          <img
-            src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=900&q=80"
-            alt="Physician available for a BloodConnector tele-consult"
-            className="h-52 w-full object-cover md:h-full"
-          />
-          <div className="flex flex-col justify-center p-5 sm:p-8">
-            <p className="m-0 text-xs font-extrabold tracking-wide text-brand uppercase">24/7 tele-consult</p>
-            <h3 className="mt-2 mb-2 text-xl font-extrabold">Care for donors and patients</h3>
-            <p className="m-0 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-              No charge for BloodConnector members during emergency matching. Phone, video, or chat with a certified doctor.
-            </p>
-            <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-              <Link to="/doctors" className="inline-flex h-11 items-center justify-center rounded-lg bg-brand px-6 font-extrabold text-white no-underline hover:bg-brand-hover">
-                Talk to a doctor
-              </Link>
-              <a href="tel:999" className={`${btnOutline} h-11 px-6 no-underline`}>
-                Emergency 999
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
     </Layout>
   )
 }

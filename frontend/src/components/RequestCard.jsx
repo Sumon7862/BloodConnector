@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import DonorAvatar from './DonorAvatar.jsx'
+import BloodTypeBadge from './BloodTypeBadge.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { btnOutline, cardClass } from '../lib/classes.js'
 import {
@@ -42,7 +43,7 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
         <DonorAvatar name={request.requesterName} photo={request.requesterPhoto} size="sm" />
         <div className="min-w-0 flex-1">
           <p className="m-0 flex flex-wrap items-center gap-2">
-            <strong className="text-xl text-brand">{request.bloodType}</strong>
+            <BloodTypeBadge type={request.bloodType} size="lg" />
             <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${urgencyClass(request.urgency)}`}>
               {request.urgency}
             </span>
@@ -71,8 +72,8 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
             </Link>
           </div>
         ) : (
-          <p className="mt-auto mb-0 pt-4 text-xs font-semibold text-slate-400">
-            Matching {request.bloodType} donors see this on their dashboard.
+          <p className="mt-auto mb-0 flex flex-wrap items-center gap-1.5 pt-4 text-xs font-semibold text-slate-400">
+            Matching <BloodTypeBadge type={request.bloodType} size="sm" /> donors see this on their dashboard.
           </p>
         )
       ) : null}
@@ -122,9 +123,9 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
                 <div className="flex items-start gap-3">
                   <DonorAvatar name={offer.donorName} photo={offer.donorPhoto} size="sm" />
                   <div className="min-w-0 flex-1">
-                    <p className="m-0 font-bold">
+                    <p className="m-0 flex flex-wrap items-center gap-2 font-bold">
                       {offer.donorName}
-                      {offer.donorBloodType ? <span className="ml-2 text-brand">{offer.donorBloodType}</span> : null}
+                      <BloodTypeBadge type={offer.donorBloodType} size="sm" />
                     </p>
                     <p className="mt-1 mb-0 text-xs font-semibold tracking-wide text-slate-400 uppercase">{statusLabel(offer.status)}</p>
                     {offer.donorPhone ? (

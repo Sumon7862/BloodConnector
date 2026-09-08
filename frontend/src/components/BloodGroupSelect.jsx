@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { BLOOD_GROUPS } from '../utils/validation.js'
 import { inputClass } from '../lib/classes.js'
+import BloodTypeBadge from './BloodTypeBadge.jsx'
 
 export default function BloodGroupSelect({ id, value, onChange, onBlur, error }) {
   const [open, setOpen] = useState(false)
@@ -34,7 +35,9 @@ export default function BloodGroupSelect({ id, value, onChange, onBlur, error })
         onBlur={onBlur}
         onClick={() => setOpen((v) => !v)}
       >
-        <span>{value || 'Select your blood group'}</span>
+        <span className={value ? 'flex items-center gap-2 text-slate-900 dark:text-white' : ''}>
+          {value ? <BloodTypeBadge type={value} size="sm" /> : 'Select your blood group'}
+        </span>
         <svg viewBox="0 0 24 24" className={`h-[18px] w-[18px] fill-none stroke-current stroke-[1.8] text-slate-500 transition ${open ? 'rotate-180' : ''}`} aria-hidden="true">
           <path d="M6 9l6 6 6-6" />
         </svg>
@@ -47,13 +50,13 @@ export default function BloodGroupSelect({ id, value, onChange, onBlur, error })
                 type="button"
                 role="option"
                 aria-selected={value === group}
-                className={`w-full rounded-md border-0 bg-transparent px-3 py-2.5 text-left ${value === group ? 'bg-rose-50 text-brand dark:bg-brand/15' : 'hover:bg-rose-50 hover:text-brand dark:hover:bg-brand/15'}`}
+                className={`flex w-full items-center gap-2 rounded-md border-0 bg-transparent px-3 py-2.5 text-left ${value === group ? 'bg-rose-50 dark:bg-brand/15' : 'hover:bg-rose-50 dark:hover:bg-brand/15'}`}
                 onClick={() => {
                   onChange(group)
                   setOpen(false)
                 }}
               >
-                {group}
+                <BloodTypeBadge type={group} size="sm" />
               </button>
             </li>
           ))}

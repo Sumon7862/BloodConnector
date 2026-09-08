@@ -66,7 +66,7 @@ export default function OpinionSlider() {
       <header className="mb-7 flex flex-col items-center text-center sm:mb-8">
         <h2 className="m-0 text-[clamp(24px,3vw,32px)] font-extrabold tracking-tight">What our community says</h2>
         <p className="mt-2 mb-0 max-w-2xl text-slate-500 dark:text-slate-400">
-          Real notes from donors and doctors. Add yours from the gallery after you help someone.
+          Notes from patients, donors, and doctors after they help each other.
         </p>
       </header>
 
@@ -143,7 +143,7 @@ export default function OpinionSlider() {
 
       <div className="mt-6 flex justify-center">
         <Link to="/gallery" className="text-sm font-extrabold text-brand no-underline hover:underline">
-          Read all stories
+          See the gallery
         </Link>
       </div>
     </section>

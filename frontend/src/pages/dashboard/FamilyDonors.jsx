@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import DashPageHead from '../../components/DashPageHead.jsx'
 import DonorAvatar from '../../components/DonorAvatar.jsx'
+import BloodTypeBadge from '../../components/BloodTypeBadge.jsx'
 import { Icon } from '../../components/DashIcons.jsx'
 import { IconInput, IconSelect } from '../../components/IconField.jsx'
 import { btnOutline, cardClass } from '../../lib/classes.js'
@@ -97,9 +98,7 @@ export default function FamilyDonors() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="m-0 text-base font-extrabold">{person.name}</h3>
-                    {person.bloodType ? (
-                      <span className="rounded-full bg-brand px-2.5 py-0.5 text-xs font-bold text-white">{person.bloodType}</span>
-                    ) : null}
+                    {person.bloodType ? <BloodTypeBadge type={person.bloodType} size="sm" /> : null}
                     <span className="text-sm text-slate-500">{person.role}</span>
                   </div>
                   <p className="mt-1 mb-0 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">
@@ -192,7 +191,7 @@ export default function FamilyDonors() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="m-0 text-base font-extrabold">{item.name}</h3>
-                    <span className="rounded-full bg-brand px-2.5 py-0.5 text-xs font-bold text-white">{item.bloodType}</span>
+                    <BloodTypeBadge type={item.bloodType} size="sm" />
                     <span className="text-sm text-slate-500">{item.relation}</span>
                   </div>
                   <p className="mt-2 mb-0 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">

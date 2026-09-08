@@ -5,6 +5,7 @@ import { Icon } from '../../components/DashIcons.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { btnOutline, cardClass } from '../../lib/classes.js'
 import { loadNotifications, saveNotifications } from '../../lib/notifications.js'
+import { HighlightBloodTypes } from '../../components/BloodTypeBadge.jsx'
 
 export default function Notifications() {
   const { user } = useAuth()
@@ -57,8 +58,12 @@ export default function Notifications() {
               <Icon name={item.tone === 'heart' ? 'heart' : item.tone === 'clock' ? 'clock' : item.tone === 'bell' ? 'bell' : 'drop'} />
             </span>
             <div className="min-w-0 flex-1">
-              <h2 className="m-0 text-base font-extrabold">{item.title}</h2>
-              <p className="mt-1 mb-0 text-sm text-slate-500 dark:text-slate-400">{item.message}</p>
+              <h2 className="m-0 text-base font-extrabold">
+                <HighlightBloodTypes text={item.title} />
+              </h2>
+              <p className="mt-1 mb-0 text-sm text-slate-500 dark:text-slate-400">
+                <HighlightBloodTypes text={item.message} />
+              </p>
               <p className="mt-1 mb-0 text-xs text-slate-400">{item.time}</p>
             </div>
             <div className="flex items-center gap-2">

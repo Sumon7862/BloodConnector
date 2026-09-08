@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
+import PageHero from '../components/PageHero.jsx'
 import RequestCard from '../components/RequestCard.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { btnOutline, cardClass } from '../lib/classes.js'
+import { btnOutline, cardClass, pageWidth } from '../lib/classes.js'
 import { openRequests, useRequests } from '../lib/requests.js'
 
 export default function BloodRequests() {
@@ -17,34 +18,31 @@ export default function BloodRequests() {
 
   return (
     <Layout>
-      <section className="relative overflow-hidden bg-brand text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.18),transparent_46%)]" aria-hidden="true" />
-        <div className="relative mx-auto grid w-[min(1180px,calc(100%-24px))] items-center gap-6 py-12 sm:w-[min(1180px,calc(100%-32px))] sm:py-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <h1 className="m-0 text-[clamp(32px,6vw,48px)] leading-tight font-extrabold tracking-tight text-white">
-            Blood requests
-          </h1>
-          <p className="m-0 max-w-[640px] text-[15px] leading-relaxed text-white/95 sm:text-base">
-            Each request shows who asked for blood. Donors with the same blood group receive it on
-            their dashboard, where they can contact the requester or cancel.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        tone="brand"
+        eyebrow="Patients"
+        title="Open blood requests"
+        actions={
+          <div className="mt-5 flex flex-wrap gap-3">
+            {isLoggedIn ? (
+              <Link to="/dashboard/request-blood" className="inline-flex h-11 items-center rounded-xl bg-white px-5 font-bold text-brand no-underline hover:bg-rose-50">
+                Submit a request
+              </Link>
+            ) : (
+              <Link to="/login" state={{ from: '/dashboard/request-blood' }} className="inline-flex h-11 items-center rounded-xl bg-white px-5 font-bold text-brand no-underline hover:bg-rose-50">
+                Login to request
+              </Link>
+            )}
+          </div>
+        }
+      >
+        Each ask shows who needs blood. Donors with the same group see it on their dashboard and can call or decline.
+      </PageHero>
 
-      <div className="mx-auto w-[min(1180px,calc(100%-24px))] py-8 sm:w-[min(1180px,calc(100%-32px))] sm:py-12">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="m-0 text-sm text-slate-500 dark:text-slate-400">
-            {open.length} open {open.length === 1 ? 'request' : 'requests'}
-          </p>
-          {isLoggedIn ? (
-            <Link to="/dashboard/request-blood" className={`${btnOutline} h-10 px-4 no-underline`}>
-              Submit a request
-            </Link>
-          ) : (
-            <Link to="/login" state={{ from: '/dashboard/open-requests' }} className={`${btnOutline} h-10 px-4 no-underline`}>
-              Login to respond
-            </Link>
-          )}
-        </div>
+      <div className={`${pageWidth} py-10 sm:py-14`}>
+        <p className="mb-6 text-sm font-semibold text-slate-500 dark:text-slate-400">
+          {open.length} open {open.length === 1 ? 'request' : 'requests'}
+        </p>
 
         {open.length ? (
           <div className="grid gap-4 md:grid-cols-3">
@@ -57,6 +55,15 @@ export default function BloodRequests() {
             No open blood requests right now.
           </p>
         )}
+
+        {!isLoggedIn ? (
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Donors:{' '}
+            <Link to="/login" state={{ from: '/dashboard/open-requests' }} className={`${btnOutline} ml-1 h-9 px-3 no-underline`}>
+              Login to respond
+            </Link>
+          </p>
+        ) : null}
       </div>
     </Layout>
   )

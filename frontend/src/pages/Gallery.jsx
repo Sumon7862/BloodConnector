@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
+import PageHero from '../components/PageHero.jsx'
 import DonorAvatar from '../components/DonorAvatar.jsx'
 import OpinionEditor from '../components/OpinionEditor.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { formatOpinionDate, loadOpinions } from '../data/gallery.js'
-import { btnPrimary, cardClass, inputClass } from '../lib/classes.js'
+import { btnPrimary, cardClass, inputClass, pageWidth } from '../lib/classes.js'
 
 export default function Gallery() {
   const { user, isLoggedIn } = useAuth()
@@ -17,32 +18,23 @@ export default function Gallery() {
 
   return (
     <Layout>
-      <section className="relative overflow-hidden bg-brand text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.18),transparent_46%)]" aria-hidden="true" />
-        <div className="relative mx-auto grid w-[min(1180px,calc(100%-24px))] items-center gap-6 py-12 sm:w-[min(1180px,calc(100%-32px))] sm:py-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <h1 className="m-0 text-[clamp(32px,6vw,48px)] leading-tight font-extrabold tracking-tight text-white">
-            Gallery
-          </h1>
-          <p className="m-0 max-w-[640px] text-[15px] leading-relaxed text-white/95 sm:text-base">
-            Donors and doctors share one short opinion each (max 100 characters). You can edit yours
-            anytime from the gallery or your dashboard.
-          </p>
-        </div>
-      </section>
+      <PageHero eyebrow="Gallery" title="Community gallery">
+        Patients, donors, and doctors share short notes here. Post or edit yours anytime.
+      </PageHero>
 
-      <div className="mx-auto w-[min(1180px,calc(100%-24px))] py-8 sm:w-[min(1180px,calc(100%-32px))] sm:py-12">
+      <div className={`${pageWidth} py-10 sm:py-14`}>
         {isLoggedIn ? (
           <OpinionEditor user={user} inputClass={inputClass} onSaved={setOpinions} />
         ) : (
           <div className={`${cardClass} p-6 text-center`}>
             <h2 className="m-0 text-xl font-extrabold">Login to share your opinion</h2>
             <p className="mt-2 mb-5 text-sm text-slate-500 dark:text-slate-400">
-              Each member can post one opinion. Your photo, name, address, and role come from your profile.
+              One opinion per member. Name, photo, and role come from your profile.
             </p>
             <div className="flex flex-col justify-center gap-2 sm:flex-row">
               <Link
                 to="/login"
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-300 px-5 font-bold text-slate-800 no-underline hover:border-brand hover:text-brand dark:border-slate-600 dark:text-slate-100"
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 px-5 font-bold text-slate-800 no-underline hover:border-brand hover:text-brand dark:border-slate-600 dark:text-slate-100"
               >
                 Login
               </Link>
@@ -57,7 +49,7 @@ export default function Gallery() {
           <header className="mb-6">
             <h2 className="m-0 text-[clamp(22px,3vw,28px)] font-extrabold tracking-tight">Community voices</h2>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              {opinions.length} {opinions.length === 1 ? 'story' : 'stories'} from donors and doctors
+              {opinions.length} {opinions.length === 1 ? 'story' : 'stories'} from the network
             </p>
           </header>
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
 import DonorAvatar from '../components/DonorAvatar.jsx'
+import BloodTypeBadge from '../components/BloodTypeBadge.jsx'
 import { donationTypeClass, DONATION_TYPES, getDonor, getDonorStats } from '../data/donors.js'
 import { btnOutline, cardClass, inputClass } from '../lib/classes.js'
 
@@ -77,8 +78,9 @@ export default function DonorHistory() {
           <h1 className="mt-5 m-0 text-[clamp(28px,5vw,40px)] font-extrabold tracking-tight text-white">
             {donor.name}
           </h1>
-          <p className="mt-2 text-sm text-white/90 sm:text-base">
-            {donor.location} | {donor.bloodType}
+          <p className="mt-2 mb-0 flex flex-wrap items-center justify-center gap-2 text-sm text-white/90 sm:text-base">
+            {donor.location}
+            <BloodTypeBadge type={donor.bloodType} tone="inverse" />
           </p>
           <a
             href={`tel:${donor.phone}`}
