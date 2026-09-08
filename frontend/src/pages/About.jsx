@@ -15,7 +15,7 @@ import { btnOutline, cardClass, pageWidth } from '../lib/classes.js'
 
 export default function About() {
   useEffect(() => {
-    document.title = 'BloodConnector — About'
+    document.title = 'BloodConnector — About the blood donor network'
   }, [])
 
   return (

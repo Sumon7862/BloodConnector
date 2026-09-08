@@ -11,7 +11,6 @@ import SectionHeader from '../components/SectionHeader.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import {
   BLOOD_TYPES,
-  HOME_STATS,
   HOW_IT_WORKS,
 } from '../data/homeData.js'
 import { fetchBanks, fetchDonors } from '../lib/directory.js'
@@ -35,9 +34,15 @@ export default function Home() {
   const [allDonors, setAllDonors] = useState([])
   const [banks, setBanks] = useState([])
   const [doctors, setDoctors] = useState([])
+  const liveStats = [
+    [String(allDonors.length), 'Directory donors'],
+    [String(openRequests(requests).length), 'Open requests'],
+    [String(doctors.length), 'Volunteer doctors'],
+    ['24/7', 'Doctor support'],
+  ]
 
   useEffect(() => {
-    document.title = 'BloodConnector'
+    document.title = 'BloodConnector — Find blood donors and volunteer doctors'
   }, [])
 
   useEffect(() => {
@@ -77,8 +82,6 @@ export default function Home() {
     <Layout>
       <section className="relative overflow-hidden bg-navy text-white">
         <img
-          src="https://images.unsplash.com/photo-1615461066841-6116ee365664?auto=format&fit=crop&w=1800&q=80"
-          alt="Medical staff preparing a blood donation"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(11,36,71,0.95)_0%,rgba(11,36,71,0.82)_50%,rgba(225,29,45,0.72)_100%)]" />
@@ -191,7 +194,7 @@ export default function Home() {
 
       <section className={`${pageWidth} pt-10`}>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {HOME_STATS.map(([value, label]) => (
+          {liveStats.map(([value, label]) => (
             <article key={label} className={`${cardClass} px-4 py-5 text-center`}>
               <p className="m-0 text-2xl font-extrabold text-brand sm:text-3xl">{value}</p>
               <p className="mt-1 mb-0 text-sm font-semibold text-slate-500 dark:text-slate-400">{label}</p>
@@ -254,7 +257,7 @@ export default function Home() {
           subtitle="If a donor is still waiting, check live inventory from partner hospitals."
         />
         <div className="grid gap-4">
-          {visibleBanks.map((bank) => (
+          {visibleBanks.length ? visibleBanks.map((bank) => (
             <article key={bank.id} className={`${cardClass} p-4 sm:p-5`}>
               <div className="mb-4 flex flex-col justify-between gap-3 sm:gap-4 md:flex-row md:items-start">
                 <div>
@@ -282,7 +285,9 @@ export default function Home() {
                 ))}
               </div>
             </article>
-          ))}
+          )) : (
+            <p className={`${cardClass} px-5 py-10 text-center text-slate-500`}>No partner blood banks listed yet.</p>
+          )}
         </div>
         {banks.length > 2 ? (
           <div className="mt-6 flex justify-center">
@@ -299,11 +304,15 @@ export default function Home() {
           title="Free care for donors and patients"
           subtitle="Volunteer physicians on call for eligibility, recovery, and emergencies."
         />
+        {doctors.length ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {doctors.map((doctor) => (
             <DoctorCard key={doctor.id} doctor={doctor} />
           ))}
         </div>
+        ) : (
+          <p className={`${cardClass} px-5 py-10 text-center text-slate-500`}>No volunteer doctors listed yet.</p>
+        )}
         <div className="mt-6 flex justify-center">
           <Link to="/doctors" className={`${btnOutline} h-11 px-6 no-underline`}>See all doctors</Link>
         </div>

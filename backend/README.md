@@ -43,6 +43,14 @@ JWT_SECRET=a-long-random-secret
 CORS_ORIGIN=https://your-frontend.example,https://your-admin.example
 ```
 
+## Remove dummy data
+
+Deletes directory donors/doctors/banks, requests, opinions, and every user except admins:
+
+```bash
+npm run clean-dummy
+```
+
 ## Seed admin
 
 First start e automatically create hoy:

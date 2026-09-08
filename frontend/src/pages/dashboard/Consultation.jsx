@@ -62,21 +62,25 @@ export default function Consultation() {
             </span>
             <h3 className="mt-4 mb-1 text-base font-extrabold">{item.title}</h3>
             <p className="m-0 text-sm text-slate-500">{item.copy}</p>
-            <a
-              href="tel:+8801712002001"
+            <Link
+              to="/doctors"
               className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-xl bg-brand text-sm font-bold text-white no-underline hover:bg-brand-hover"
             >
               {item.action}
-            </a>
+            </Link>
           </article>
         ))}
       </div>
 
       <h2 className="mt-8 mb-4 text-lg font-extrabold">{isDoctor ? 'Your colleagues' : 'Available doctors'}</h2>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {doctors.map((doctor) => (
+        {doctors.length ? doctors.map((doctor) => (
           <DoctorCard key={doctor.id} doctor={doctor} />
-        ))}
+        )) : (
+          <p className={`${cardClass} px-5 py-10 text-center text-slate-500 sm:col-span-2 xl:col-span-3`}>
+            No volunteer doctors listed yet.
+          </p>
+        )}
       </div>
       <p className="mt-6 mb-0 text-center text-sm text-slate-500">
         Public directory:{' '}

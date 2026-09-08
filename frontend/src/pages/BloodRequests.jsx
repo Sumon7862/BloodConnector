@@ -13,7 +13,7 @@ export default function BloodRequests() {
   const open = openRequests(requests)
 
   useEffect(() => {
-    document.title = 'BloodConnector — Blood Requests'
+    document.title = 'BloodConnector — Live blood requests'
   }, [])
 
   return (

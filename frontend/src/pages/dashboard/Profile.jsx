@@ -16,7 +16,6 @@ import {
   validateFullName,
   validatePhone,
 } from '../../utils/validation.js'
-import { SEED_APPOINTMENTS } from '../../data/dashboardData.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 
 function storageKey(prefix, user) {
@@ -72,7 +71,7 @@ function formFromUser(user) {
 export default function DashboardProfile() {
   const { user, updateUser } = useAuth()
   const isDoctor = user.role === 'doctor'
-  const appointmentKey = storageKey('bloodconnector-appointments', user)
+  const appointmentKey = storageKey('bloodconnector-appts', user)
   const extraPhones = user.phones || []
 
   const [editing, setEditing] = useState(false)
@@ -81,7 +80,7 @@ export default function DashboardProfile() {
   const [errors, setErrors] = useState({})
   const [newPhone, setNewPhone] = useState('')
   const [phoneError, setPhoneError] = useState('')
-  const [appointments, setAppointments] = useState(() => loadList(appointmentKey, SEED_APPOINTMENTS))
+  const [appointments, setAppointments] = useState(() => loadList(appointmentKey, []))
   const [form, setForm] = useState(() => formFromUser(user))
 
   useEffect(() => {

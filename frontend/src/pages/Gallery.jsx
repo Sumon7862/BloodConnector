@@ -13,7 +13,7 @@ export default function Gallery() {
   const [opinions, setOpinions] = useState([])
 
   useEffect(() => {
-    document.title = 'BloodConnector — Gallery'
+    document.title = 'BloodConnector — Community gallery'
   }, [])
 
   useEffect(() => {

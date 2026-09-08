@@ -10,7 +10,7 @@ export default function Doctors() {
   const [doctors, setDoctors] = useState([])
 
   useEffect(() => {
-    document.title = 'BloodConnector — Doctors'
+    document.title = 'BloodConnector — Volunteer doctors'
   }, [])
 
   useEffect(() => {
@@ -31,9 +31,13 @@ export default function Doctors() {
           subtitle="Call for eligibility, recovery, or emergency advice while a blood match is underway."
         />
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {doctors.map((doctor) => (
+          {doctors.length ? doctors.map((doctor) => (
             <DoctorCard key={doctor.id} doctor={doctor} />
-          ))}
+          )) : (
+            <p className="rounded-xl border border-slate-200 bg-white px-5 py-10 text-center text-slate-500 sm:col-span-2 xl:col-span-3 dark:border-slate-700 dark:bg-panel">
+              No volunteer doctors listed yet.
+            </p>
+          )}
         </div>
       </section>
     </Layout>

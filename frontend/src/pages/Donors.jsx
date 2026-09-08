@@ -20,7 +20,7 @@ export default function Donors() {
   const [allDonors, setAllDonors] = useState([])
 
   useEffect(() => {
-    document.title = 'BloodConnector — Donors'
+    document.title = 'BloodConnector — Blood donors near you'
   }, [])
 
   useEffect(() => {
