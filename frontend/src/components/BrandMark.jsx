@@ -5,7 +5,7 @@ export default function BrandMark({ size = 'md', to = '/', className = '', inver
   const content = (
     <span className={`inline-flex min-w-0 items-center gap-1.5 sm:gap-2 ${stacked ? 'flex-col gap-3' : ''}`}>
       <img
-        src="/logo.svg"
+        src="/logo.png"
         alt=""
         width={stacked ? 72 : 36}
         height={stacked ? 72 : 36}

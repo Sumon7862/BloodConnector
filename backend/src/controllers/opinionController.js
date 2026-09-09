@@ -21,7 +21,7 @@ export const saveOpinion = asyncHandler(async (req, res) => {
   const record = {
     userId: req.user.id,
     name: req.user.name,
-    role: req.user.role === 'doctor' ? 'Doctor' : 'Donor',
+    role: 'Donor',
     location: req.user.address || '',
     rating: Math.min(5, Math.max(1, Number(body.rating) || 5)),
     opinion: text.slice(0, 100),

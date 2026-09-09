@@ -4,46 +4,30 @@ import { useAuth } from '../context/AuthContext.jsx'
 
 const ROLES = [
   {
-    id: 'patient',
-    kicker: 'Patients',
-    title: 'Need blood',
-    copy: 'Post a request. Matching donors see it instantly and can call you.',
+    id: 'request',
+    kicker: 'Need blood',
+    title: 'Request blood',
+    copy: 'Post a request with your blood type and location. Matching donors see it instantly.',
     guestTo: '/requests',
     authTo: '/dashboard/request-blood',
     cta: 'Request blood',
   },
   {
-    id: 'donor',
-    kicker: 'Donors',
-    title: 'Give blood',
-    copy: 'Stay eligible, answer matching requests, and keep someone alive today.',
+    id: 'donate',
+    kicker: 'Give blood',
+    title: 'Donate blood',
+    copy: 'Stay eligible, answer matching requests, and help someone who needs your group today.',
     guestTo: '/donors',
     authTo: '/dashboard/open-requests',
-    cta: 'Help as a donor',
-  },
-  {
-    id: 'doctor',
-    kicker: 'Doctors',
-    title: 'Give care',
-    copy: 'Advise donors and patients on eligibility, recovery, and emergencies — free.',
-    guestTo: '/doctors',
-    authTo: '/dashboard/consultation',
-    cta: 'Talk to a doctor',
+    cta: 'Find who needs you',
   },
 ]
 
 export default function NetworkRoles() {
-  const { user, isLoggedIn } = useAuth()
-
-  function hrefFor(role) {
-    if (!isLoggedIn) return role.guestTo
-    if (role.id === 'donor' && user?.role === 'doctor') return '/donors'
-    if (role.id === 'doctor' && user?.role !== 'doctor') return '/doctors'
-    return role.authTo
-  }
+  const { isLoggedIn } = useAuth()
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2">
       {ROLES.map((role, index) => (
         <article key={role.id} className={`${cardClass} ${cardHover} p-6`}>
           <p className="m-0 text-[11px] font-bold tracking-[0.2em] text-brand uppercase">
@@ -52,7 +36,7 @@ export default function NetworkRoles() {
           <h3 className="mt-3 mb-2 text-xl font-extrabold">{role.title}</h3>
           <p className="m-0 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{role.copy}</p>
           <Link
-            to={hrefFor(role)}
+            to={isLoggedIn ? role.authTo : role.guestTo}
             className="mt-5 inline-flex text-sm font-bold text-brand no-underline hover:underline"
           >
             {role.cta} →
@@ -62,4 +46,3 @@ export default function NetworkRoles() {
     </div>
   )
 }
-

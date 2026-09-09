@@ -10,7 +10,6 @@ const PRIMARY_LINKS = [
   { to: '/', label: 'Home', end: true },
   { to: '/donors', label: 'Donors' },
   { to: '/requests', label: 'Requests' },
-  { to: '/doctors', label: 'Doctors' },
   { to: '/gallery', label: 'Gallery' },
   { to: '/about', label: 'About', end: true },
 ]

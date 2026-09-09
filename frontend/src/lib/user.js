@@ -12,7 +12,6 @@ export function getInitials(name) {
 }
 
 export function roleLabel(role) {
-  if (role === 'doctor') return 'Doctor'
   if (role === 'admin') return 'Admin'
   return 'Donor'
 }

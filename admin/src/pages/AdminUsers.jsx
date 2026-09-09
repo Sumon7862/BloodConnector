@@ -34,7 +34,7 @@ export default function AdminUsers() {
 
   return (
     <div>
-      <DashPageHead title="Users" subtitle="Verify, block, or change donor and doctor accounts." />
+      <DashPageHead title="Users" subtitle="Verify or block donor accounts." />
       {error ? <p className="mb-4 text-sm font-medium text-brand">{error}</p> : null}
       {loading ? <p className="text-sm text-slate-500">Loading…</p> : (
       <div className="space-y-3">
@@ -60,13 +60,6 @@ export default function AdminUsers() {
               </button>
               <button type="button" className={`${btnOutline} h-9`} onClick={() => patch(user.id, { status: 'blocked' }, `Block ${user.name}? They will not be able to log in.`)}>
                 Block
-              </button>
-              <button
-                type="button"
-                className={`${btnOutline} h-9`}
-                onClick={() => patch(user.id, { role: user.role === 'doctor' ? 'donor' : 'doctor' })}
-              >
-                Make {user.role === 'doctor' ? 'donor' : 'doctor'}
               </button>
             </div>
           </article>

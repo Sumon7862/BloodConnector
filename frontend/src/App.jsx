@@ -7,8 +7,6 @@ import Home from './pages/Home.jsx'
 import About from './pages/About.jsx'
 import Donors from './pages/Donors.jsx'
 import DonorHistory from './pages/DonorHistory.jsx'
-import Doctors from './pages/Doctors.jsx'
-import DoctorDetails from './pages/DoctorDetails.jsx'
 import BloodRequests from './pages/BloodRequests.jsx'
 import Gallery from './pages/Gallery.jsx'
 import Login from './pages/Login.jsx'
@@ -19,7 +17,6 @@ import RequestBlood from './pages/dashboard/RequestBlood.jsx'
 import MyDonations from './pages/dashboard/MyDonations.jsx'
 import DashboardGallery from './pages/dashboard/DashboardGallery.jsx'
 import BloodTypes from './pages/dashboard/BloodTypes.jsx'
-import Consultation from './pages/dashboard/Consultation.jsx'
 import DashboardProfile from './pages/dashboard/Profile.jsx'
 import FamilyDonors from './pages/dashboard/FamilyDonors.jsx'
 import OpenRequests from './pages/dashboard/OpenRequests.jsx'
@@ -51,8 +48,6 @@ function AppRoutes() {
         <Route path="/about" element={<About />} />
         <Route path="/donors" element={<Donors />} />
         <Route path="/donors/:id" element={<DonorHistory />} />
-        <Route path="/doctors" element={<Doctors />} />
-        <Route path="/doctors/:id" element={<DoctorDetails />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/requests" element={<BloodRequests />} />
         <Route
@@ -88,7 +83,6 @@ function AppRoutes() {
           <Route path="donations" element={<MyDonations />} />
           <Route path="gallery" element={<DashboardGallery />} />
           <Route path="blood-types" element={<BloodTypes />} />
-          <Route path="consultation" element={<Consultation />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>

@@ -7,8 +7,6 @@ import {
   updateRequest,
   deleteRequest,
   donorsAdmin,
-  doctorsAdmin,
-  banksAdmin,
   listOpinions,
   updateOpinion,
   deleteOpinion,
@@ -30,16 +28,6 @@ router.get('/donors', donorsAdmin.list)
 router.post('/donors', donorsAdmin.create)
 router.patch('/donors/:id', donorsAdmin.update)
 router.delete('/donors/:id', donorsAdmin.remove)
-
-router.get('/doctors', doctorsAdmin.list)
-router.post('/doctors', doctorsAdmin.create)
-router.patch('/doctors/:id', doctorsAdmin.update)
-router.delete('/doctors/:id', doctorsAdmin.remove)
-
-router.get('/banks', banksAdmin.list)
-router.post('/banks', banksAdmin.create)
-router.patch('/banks/:id', banksAdmin.update)
-router.delete('/banks/:id', banksAdmin.remove)
 
 router.get('/opinions', listOpinions)
 router.patch('/opinions/:id', updateOpinion)

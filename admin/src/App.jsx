@@ -7,8 +7,6 @@ import AdminHome from './pages/AdminHome.jsx'
 import AdminUsers from './pages/AdminUsers.jsx'
 import AdminRequests from './pages/AdminRequests.jsx'
 import AdminDonors from './pages/AdminDonors.jsx'
-import AdminDoctors from './pages/AdminDoctors.jsx'
-import AdminBanks from './pages/AdminBanks.jsx'
 import AdminOpinions from './pages/AdminOpinions.jsx'
 
 function GuestOnly({ children }) {
@@ -49,8 +47,6 @@ function AppRoutes() {
         <Route path="users" element={<AdminUsers />} />
         <Route path="requests" element={<AdminRequests />} />
         <Route path="donors" element={<AdminDonors />} />
-        <Route path="doctors" element={<AdminDoctors />} />
-        <Route path="banks" element={<AdminBanks />} />
         <Route path="opinions" element={<AdminOpinions />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

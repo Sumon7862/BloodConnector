@@ -12,17 +12,15 @@ export function publicUser(user) {
   delete obj._id
   delete obj.__v
   delete obj.passwordHash
-  return { ...obj, hasPassword: Boolean(user.passwordHash) }
+  return { ...obj, hasPassword: Boolean(user.passwordHash), role: obj.role === 'doctor' ? 'donor' : obj.role }
 }
 
 export function shapeUser(input = {}, previous = null) {
   const requestedRole = input.role || previous?.role || 'donor'
   const role =
-    requestedRole === 'doctor'
-      ? 'doctor'
-      : requestedRole === 'admin' && previous?.role === 'admin'
-        ? 'admin'
-        : 'donor'
+    requestedRole === 'admin' && previous?.role === 'admin'
+      ? 'admin'
+      : 'donor'
 
   return {
     id: previous?.id,
@@ -43,17 +41,10 @@ export function shapeUser(input = {}, previous = null) {
     weight: input.weight ?? previous?.weight ?? '',
     emergencyContact: input.emergencyContact ?? previous?.emergencyContact ?? '',
     medicalConditions: input.medicalConditions ?? previous?.medicalConditions ?? '',
-    specialization: input.specialization ?? previous?.specialization ?? 'General Physician',
-    registration: input.registration ?? previous?.registration ?? '',
-    hospital: input.hospital ?? previous?.hospital ?? '',
-    experience: input.experience ?? previous?.experience ?? '5',
-    bio: input.bio ?? previous?.bio ?? '',
     available: input.available ?? previous?.available ?? true,
     joinedAt: previous?.joinedAt || input.joinedAt || new Date().toISOString(),
     lastDonatedAt: previous?.lastDonatedAt || input.lastDonatedAt || '',
     nextEligibleAt: previous?.nextEligibleAt || input.nextEligibleAt || '',
     donationCount: previous?.donationCount ?? input.donationCount ?? 0,
-    consultations: previous?.consultations ?? input.consultations ?? 0,
-    rating: previous?.rating ?? input.rating ?? '4.8',
   }
 }

@@ -12,8 +12,6 @@ const LINKS = [
   { to: '/users', label: 'Users', icon: 'user' },
   { to: '/requests', label: 'Requests', icon: 'alert' },
   { to: '/donors', label: 'Donors', icon: 'people' },
-  { to: '/doctors', label: 'Doctors', icon: 'consult' },
-  { to: '/banks', label: 'Blood banks', icon: 'drop' },
   { to: '/opinions', label: 'Opinions', icon: 'heart' },
 ]
 

@@ -4,9 +4,9 @@ import tailwindcss from '@tailwindcss/vite'
 import fs from 'node:fs'
 import path from 'node:path'
 
-const PUBLIC_PATHS = ['/', '/donors', '/requests', '/doctors', '/gallery', '/about']
+const PUBLIC_PATHS = ['/', '/donors', '/requests', '/gallery', '/about']
 const DESCRIPTION =
-  'BloodConnector is a free network for patients, blood donors, and volunteer doctors. Search matching donors, post a blood request, and get medical advice.'
+  'BloodConnector is a free donor network. Search matching donors, post a blood request, and donate blood.'
 
 function seoPlugin(siteUrl) {
   return {

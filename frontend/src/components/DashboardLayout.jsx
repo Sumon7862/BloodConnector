@@ -9,21 +9,14 @@ export default function DashboardLayout() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
-  const isDoctor = user?.role === 'doctor'
   const isAdmin = user?.role === 'admin'
-
   const links = [
     { to: '/dashboard', label: 'Overview', icon: 'home', end: true },
     { to: '/dashboard/profile', label: 'Profile', icon: 'user' },
     { to: '/dashboard/request-blood', label: 'Request Blood', icon: 'drop' },
     { to: '/dashboard/open-requests', label: 'Matching Requests', icon: 'alert' },
-    ...(!isDoctor
-      ? [
-          { to: '/dashboard/people', label: 'Family & Donors', icon: 'people' },
-          { to: '/dashboard/donations', label: 'My Donations', icon: 'heart' },
-        ]
-      : [{ to: '/dashboard/donations', label: 'My Consultations', icon: 'heart' }]),
-    { to: '/dashboard/consultation', label: isDoctor ? 'Consultation desk' : 'Consult a Doctor', icon: 'consult' },
+    { to: '/dashboard/people', label: 'Family & Donors', icon: 'people' },
+    { to: '/dashboard/donations', label: 'My Donations', icon: 'heart' },
     { to: '/dashboard/notifications', label: 'Notifications', icon: 'bell' },
     { to: '/dashboard/settings', label: 'Settings', icon: 'gear' },
   ]
@@ -61,7 +54,7 @@ export default function DashboardLayout() {
         } fixed top-16 bottom-0 left-0 z-40 flex w-65 flex-col overflow-hidden border-r border-slate-200 bg-white transition-transform sm:top-[72px] lg:translate-x-0 dark:border-slate-700 dark:bg-panel`}
       >
         <p className="px-5 pt-5 pb-2 text-[11px] font-bold tracking-[0.18em] text-slate-400 uppercase">
-          {isDoctor ? 'Doctor desk' : 'Donor desk'}
+          Donor desk
         </p>
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4">
           {links.map((link) => (

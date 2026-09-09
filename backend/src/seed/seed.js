@@ -13,8 +13,6 @@ export async function seedIfNeeded() {
       email: env.adminEmail,
       address: 'Dhaka',
       donationCount: 0,
-      consultations: 0,
-      rating: '',
     })
     console.log(`Seeded admin: ${env.adminEmail}`)
   }

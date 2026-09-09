@@ -45,7 +45,7 @@ CORS_ORIGIN=https://your-frontend.example,https://your-admin.example
 
 ## Remove dummy data
 
-Deletes directory donors/doctors/banks, requests, opinions, and every user except admins:
+Deletes directory donors, requests, opinions, and every user except admins:
 
 ```bash
 npm run clean-dummy
@@ -58,4 +58,4 @@ First start e automatically create hoy:
 - Email: `admin@bloodconnector.com`
 - Password: `Admin123!`
 
-Roles: `donor | doctor | admin`. Status: `pending | active | blocked`.
+Roles: `donor | admin`. Status: `pending | active | blocked`.

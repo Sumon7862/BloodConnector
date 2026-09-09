@@ -15,11 +15,3 @@ export async function fetchDonor(id) {
     return null
   }
 }
-
-export async function fetchBanks() {
-  try {
-    return await api('/banks', { auth: false })
-  } catch {
-    return []
-  }
-}

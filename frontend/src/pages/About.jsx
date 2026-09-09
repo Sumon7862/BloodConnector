@@ -34,7 +34,7 @@ export default function About() {
         </section>
 
         <section>
-          <SectionHeader eyebrow="How we connect" title="Three roles. One outcome." />
+          <SectionHeader eyebrow="How we connect" title="Request blood. Donate blood." />
           <NetworkRoles />
         </section>
 
@@ -68,9 +68,6 @@ export default function About() {
           </Link>
           <Link to="/requests" className={`${btnOutline} h-11 px-6 no-underline`}>
             See requests
-          </Link>
-          <Link to="/doctors" className={`${btnOutline} h-11 px-6 no-underline`}>
-            Talk to a doctor
           </Link>
         </div>
       </div>

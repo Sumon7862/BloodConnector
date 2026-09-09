@@ -53,7 +53,7 @@ export default function DonorHistory() {
   if (!donor) return null
 
   function exportHistory() {
-    const header = ['ID', 'Type', 'Status', 'Date', 'Location', 'Amount (ml)', 'Recipient', 'Blood Bank']
+    const header = ['ID', 'Type', 'Status', 'Date', 'Location', 'Amount (ml)', 'Recipient', 'Hospital']
     const rows = donations.map((item) => [
       item.id,
       item.type,
@@ -193,7 +193,7 @@ export default function DonorHistory() {
                       </dl>
                       <div className="mt-4 flex flex-col gap-1 border-t border-slate-200 pt-3 text-sm text-slate-500 sm:flex-row sm:gap-6 dark:border-slate-700">
                         <p className="m-0"><span className="font-semibold text-slate-700 dark:text-slate-200">Recipient:</span> {item.recipient}</p>
-                        <p className="m-0"><span className="font-semibold text-slate-700 dark:text-slate-200">Blood Bank:</span> {item.bloodBank}</p>
+                        <p className="m-0"><span className="font-semibold text-slate-700 dark:text-slate-200">Hospital:</span> {item.bloodBank}</p>
                       </div>
                     </article>
                   )) : (

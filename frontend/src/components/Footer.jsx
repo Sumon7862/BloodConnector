@@ -9,8 +9,7 @@ export default function Footer() {
         <div>
           <BrandMark to="/" inverse />
           <p className="mt-4 mb-0 max-w-md text-sm leading-relaxed text-white/70">
-            Patients request blood. Donors answer. Doctors keep both sides safe. One verified network
-            for Bangladesh.
+            Donors request blood and donate blood in one verified network for Bangladesh.
           </p>
         </div>
         <div>
@@ -18,7 +17,6 @@ export default function Footer() {
           <ul className="m-0 list-none space-y-2 p-0 text-sm">
             <li><Link className="text-white/70 no-underline hover:text-white" to="/requests">Requests</Link></li>
             <li><Link className="text-white/70 no-underline hover:text-white" to="/donors">Donors</Link></li>
-            <li><Link className="text-white/70 no-underline hover:text-white" to="/doctors">Doctors</Link></li>
           </ul>
         </div>
         <div>
@@ -40,7 +38,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/50">
-        © {new Date().getFullYear()} BloodConnector. Patients, donors, and doctors — connected.
+        © {new Date().getFullYear()} BloodConnector. Donors connected to save lives.
       </div>
     </footer>
   )

@@ -1,8 +1,6 @@
 import { User } from '../models/User.js'
 import { BloodRequest } from '../models/Request.js'
 import { Donor } from '../models/Donor.js'
-import { Doctor } from '../models/Doctor.js'
-import { Bank } from '../models/Bank.js'
 import { Opinion } from '../models/Opinion.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { sendError } from '../utils/http.js'
@@ -13,39 +11,30 @@ export const stats = asyncHandler(async (_req, res) => {
   const [
     users,
     donors,
-    doctors,
     pending,
     blocked,
     openRequests,
     requests,
     directoryDonors,
-    directoryDoctors,
-    banks,
     opinions,
   ] = await Promise.all([
     User.countDocuments({ role: { $ne: 'admin' } }),
     User.countDocuments({ role: 'donor' }),
-    User.countDocuments({ role: 'doctor' }),
     User.countDocuments({ status: 'pending' }),
     User.countDocuments({ status: 'blocked' }),
     BloodRequest.countDocuments({ status: 'open' }),
     BloodRequest.countDocuments(),
     Donor.countDocuments({ hidden: { $ne: true } }),
-    Doctor.countDocuments({ hidden: { $ne: true } }),
-    Bank.countDocuments({ hidden: { $ne: true } }),
     Opinion.countDocuments({ hidden: { $ne: true } }),
   ])
   res.json({
     users,
     donors,
-    doctors,
     pending,
     blocked,
     openRequests,
     requests,
     directoryDonors,
-    directoryDoctors,
-    banks,
     opinions,
   })
 })
@@ -60,7 +49,7 @@ export const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ id: req.params.id })
   if (!user || user.role === 'admin') return sendError(res, 404, 'User not found.')
   if (body.status && ['pending', 'active', 'blocked'].includes(body.status)) user.status = body.status
-  if (body.role && ['donor', 'doctor'].includes(body.role)) user.role = body.role
+  if (body.role && body.role === 'donor') user.role = 'donor'
   await user.save()
   res.json(publicUser(user))
 })
@@ -113,8 +102,6 @@ function directoryCrud(Model) {
 }
 
 export const donorsAdmin = directoryCrud(Donor)
-export const doctorsAdmin = directoryCrud(Doctor)
-export const banksAdmin = directoryCrud(Bank)
 
 export const listOpinions = asyncHandler(async (_req, res) => {
   const list = await Opinion.find().sort({ createdAt: -1 })

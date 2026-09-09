@@ -28,7 +28,7 @@ export const register = asyncHandler(async (req, res) => {
 
   const user = shapeUser({
     ...body,
-    role: body.role === 'doctor' ? 'doctor' : 'donor',
+    role: 'donor',
     status: 'active',
     email: body.email || (String(body.emailOrPhone).includes('@') ? body.emailOrPhone : ''),
     phone: body.phone || (String(body.emailOrPhone).includes('@') ? '' : body.emailOrPhone),

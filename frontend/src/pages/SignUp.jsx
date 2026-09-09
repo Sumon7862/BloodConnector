@@ -4,7 +4,6 @@ import AuthLayout from '../components/AuthLayout.jsx'
 import Field from '../components/Field.jsx'
 import PasswordInput from '../components/PasswordInput.jsx'
 import BloodGroupSelect from '../components/BloodGroupSelect.jsx'
-import RoleSelect from '../components/RoleSelect.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { readImageFile, homePath } from '../lib/user.js'
 import { openAdminApp } from '../lib/apps.js'
@@ -17,14 +16,12 @@ import {
   validateEmailOrPhone,
   validateFullName,
   validatePassword,
-  validateRole,
 } from '../utils/validation.js'
 import { btnPrimary, inputClass } from '../lib/classes.js'
 
 const INITIAL = {
   fullName: '',
   emailOrPhone: '',
-  role: '',
   address: '',
   photo: '',
   bloodGroup: '',
@@ -70,10 +67,9 @@ export default function SignUp() {
     const next = {
       fullName: validateFullName(values.fullName),
       emailOrPhone: validateEmailOrPhone(values.emailOrPhone),
-      role: validateRole(values.role),
       address: validateAddress(values.address),
       bloodGroup: validateBloodGroup(values.bloodGroup),
-      age: validateAge(values.age, values.role),
+      age: validateAge(values.age),
       password: validatePassword(values.password),
       confirmPassword: validateConfirmPassword(values.password, values.confirmPassword),
     }
@@ -81,7 +77,6 @@ export default function SignUp() {
     setTouched({
       fullName: true,
       emailOrPhone: true,
-      role: true,
       address: true,
       bloodGroup: true,
       age: true,
@@ -99,7 +94,7 @@ export default function SignUp() {
     const result = await register({
       fullName: values.fullName,
       emailOrPhone: values.emailOrPhone,
-      role: values.role,
+      role: 'donor',
       address: values.address,
       photo: values.photo,
       bloodGroup: values.bloodGroup,
@@ -132,7 +127,7 @@ export default function SignUp() {
       <form className="flex flex-col" onSubmit={handleSubmit} noValidate>
         <div className="mb-[22px]">
           <h2 id="auth-card-title" className="m-0 text-xl font-bold tracking-tight sm:text-2xl">Create Account</h2>
-          <p className="mt-2 text-sm leading-relaxed text-slate-500">Join our community and save lives through blood donation</p>
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">Create a donor account to request blood and donate blood</p>
         </div>
 
         <Field id="full-name" label="Full Name" error={touched.fullName ? errors.fullName : ''}>
@@ -146,21 +141,6 @@ export default function SignUp() {
             onChange={(event) => setField('fullName', event.target.value)}
             onBlur={() => handleBlur('fullName')}
           />
-        </Field>
-
-        <Field id="signup-role" label="Select your role" error={touched.role ? errors.role : ''}>
-          <RoleSelect
-            id="signup-role"
-            value={values.role}
-            error={touched.role ? errors.role : ''}
-            onChange={(value) => {
-              setTouched((current) => ({ ...current, role: true }))
-              setField('role', value)
-            }}
-          />
-          <p className="mt-2 mb-0 text-xs leading-relaxed text-slate-500">
-            Donors answer matching patient requests. Doctors advise donors and patients. Both can also request blood.
-          </p>
         </Field>
 
         <Field
@@ -244,7 +224,7 @@ export default function SignUp() {
             type="number"
             inputMode="numeric"
             min="18"
-            max={values.role === 'doctor' ? '80' : '65'}
+            max="65"
             placeholder="28"
             className={`${inputClass} ${touched.age && errors.age ? 'border-brand' : ''}`}
             value={values.age}
@@ -342,14 +322,12 @@ function fieldError(name, value, values) {
       return validateFullName(value)
     case 'emailOrPhone':
       return validateEmailOrPhone(value)
-    case 'role':
-      return validateRole(value)
     case 'address':
       return validateAddress(value)
     case 'bloodGroup':
       return validateBloodGroup(value)
     case 'age':
-      return validateAge(value, values.role)
+      return validateAge(value)
     case 'password':
       return validatePassword(value)
     case 'confirmPassword':

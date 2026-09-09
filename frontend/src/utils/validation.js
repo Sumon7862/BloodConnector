@@ -1,10 +1,6 @@
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i
 
 export const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
-export const USER_ROLES = [
-  { value: 'donor', label: 'Donor' },
-  { value: 'doctor', label: 'Doctor' },
-]
 
 export function digitsOnly(value) {
   return String(value || '').replace(/\D/g, '')
@@ -39,19 +35,13 @@ export function validateFullName(value) {
   return ''
 }
 
-export function validateAge(value, role = 'donor') {
+export function validateAge(value) {
   if (value === '' || value == null) return 'Age is required'
   const age = Number(value)
   if (!Number.isInteger(age)) return 'Enter a valid age'
-  const max = role === 'doctor' ? 80 : 65
-  if (age < 18 || age > max) {
-    return role === 'doctor' ? 'Doctors must be between 18 and 80' : 'Donors must be between 18 and 65'
+  if (age < 18 || age > 65) {
+    return 'Donors must be between 18 and 65'
   }
-  return ''
-}
-
-export function validateRole(value) {
-  if (value !== 'donor' && value !== 'doctor') return 'Please select Donor or Doctor'
   return ''
 }
 

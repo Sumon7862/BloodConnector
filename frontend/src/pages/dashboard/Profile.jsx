@@ -18,19 +18,6 @@ import {
 } from '../../utils/validation.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 
-function storageKey(prefix, user) {
-  return `${prefix}-${String(user.emailOrPhone || user.name || 'member').toLowerCase()}`
-}
-
-function loadList(key, seed) {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : seed
-  } catch {
-    return seed
-  }
-}
-
 function joinLabel(iso) {
   try {
     return new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -60,18 +47,11 @@ function formFromUser(user) {
     weight: user.weight || '',
     emergencyContact: user.emergencyContact || '',
     medicalConditions: user.medicalConditions || '',
-    specialization: user.specialization || 'General Physician',
-    registration: user.registration || '',
-    hospital: user.hospital || '',
-    experience: user.experience || '5',
-    bio: user.bio || '',
   }
 }
 
 export default function DashboardProfile() {
   const { user, updateUser } = useAuth()
-  const isDoctor = user.role === 'doctor'
-  const appointmentKey = storageKey('bloodconnector-appts', user)
   const extraPhones = user.phones || []
 
   const [editing, setEditing] = useState(false)
@@ -80,7 +60,6 @@ export default function DashboardProfile() {
   const [errors, setErrors] = useState({})
   const [newPhone, setNewPhone] = useState('')
   const [phoneError, setPhoneError] = useState('')
-  const [appointments, setAppointments] = useState(() => loadList(appointmentKey, []))
   const [form, setForm] = useState(() => formFromUser(user))
 
   useEffect(() => {
@@ -88,37 +67,23 @@ export default function DashboardProfile() {
   }, [user, editing])
 
   useEffect(() => {
-    document.title = isDoctor ? 'BloodConnector — Doctor Profile' : 'BloodConnector — My Profile'
-  }, [isDoctor])
+    document.title = 'BloodConnector — My Profile'
+  }, [])
 
   const donations = Number(user.donationCount) || 0
-  const consultations = Number(user.consultations) || 0
   const lives = donations * 3
-  const patients = consultations
   const bloodLiters = `${(donations * 0.5).toFixed(donations % 2 ? 1 : 0)} L`
 
-  const badges = isDoctor
-    ? [
-        ['bg-rose-100 text-brand', `Specialist ${form.specialization || 'General Physician'}`],
-        ['bg-emerald-100 text-emerald-700', `Exp: ${form.experience || 0} Years`],
-        ['bg-rose-50 text-brand', `${consultations} Consultations`],
-      ]
-    : [
-        ['bg-emerald-100 text-emerald-700', `${donations} donation`],
-        ['bg-rose-50 text-brand', `${lives} Life saved`],
-      ]
+  const badges = [
+    ['bg-emerald-100 text-emerald-700', `${donations} donation`],
+    ['bg-rose-50 text-brand', `${lives} Life saved`],
+  ]
 
-  const stats = isDoctor
-    ? [
-        ['consult', String(consultations), 'Total Consultations'],
-        ['pulse', String(patients), 'Patients Assisted'],
-        ['star', String(user.rating || '—'), 'Average Rating'],
-      ]
-    : [
-        ['calendar', String(donations), 'Total Donations'],
-        ['drop', bloodLiters, 'Blood Donated'],
-        ['user', String(lives), 'Life Saved'],
-      ]
+  const stats = [
+    ['calendar', String(donations), 'Total Donations'],
+    ['drop', bloodLiters, 'Blood Donated'],
+    ['user', String(lives), 'Life Saved'],
+  ]
 
   const fieldClass = editing ? '' : 'pointer-events-none'
 
@@ -135,8 +100,8 @@ export default function DashboardProfile() {
       address: validateAddress(form.address),
       email: form.email.trim() ? validateEmail(form.email) : '',
       phone: validatePhone(form.phone, { required: !form.email.trim() && extraPhones.length === 0 }),
-      bloodGroup: isDoctor ? '' : validateBloodGroup(form.bloodGroup),
-      age: validateAge(form.age, user.role),
+      bloodGroup: validateBloodGroup(form.bloodGroup),
+      age: validateAge(form.age),
     }
     const hasError = Object.values(nextErrors).some(Boolean)
     setErrors(nextErrors)
@@ -157,11 +122,6 @@ export default function DashboardProfile() {
         weight: form.weight,
         emergencyContact: form.emergencyContact,
         medicalConditions: form.medicalConditions,
-        specialization: form.specialization,
-        registration: form.registration,
-        hospital: form.hospital,
-        experience: form.experience,
-        bio: form.bio,
       })
       setSaveError('')
       setEditing(false)
@@ -230,12 +190,8 @@ export default function DashboardProfile() {
   return (
     <div>
       <DashPageHead
-        title={isDoctor ? 'Doctor Profile' : 'My Profile'}
-        subtitle={
-          isDoctor
-            ? 'Manage your medical profile and consultation details'
-            : 'Manage your personal information and preferences'
-        }
+        title="My Profile"
+        subtitle="Manage your personal information and preferences"
       />
 
       <section className={`${cardClass} p-5 sm:p-6`}>
@@ -253,10 +209,10 @@ export default function DashboardProfile() {
           <div className="min-w-0 text-center sm:text-left">
             <h2 className="m-0 text-2xl font-extrabold sm:text-3xl">{form.name || user.name}</h2>
             <p className="mt-1 mb-3 text-sm text-slate-500">
-              {isDoctor ? 'Doctor' : 'Blood Donor'} • Member since {joined}
+              Blood Donor • Member since {joined}
             </p>
             <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
-              {!isDoctor && form.bloodGroup ? <BloodTypeBadge type={form.bloodGroup} size="lg" /> : null}
+              {form.bloodGroup ? <BloodTypeBadge type={form.bloodGroup} size="lg" /> : null}
               {badges.map(([tone, label]) => (
                 <span key={label} className={`rounded-lg px-3 py-1.5 text-sm font-bold ${tone}`}>
                   {label}
@@ -276,9 +232,7 @@ export default function DashboardProfile() {
                 <Icon name="user" className="h-5 w-5 text-brand" /> Personal Information
               </h2>
               <p className="mt-1 mb-0 text-sm text-slate-500">
-                {isDoctor
-                  ? 'Your professional profile and clinic details.'
-                  : 'Your donor profile and medical information.'}
+                Your donor profile and medical information.
               </p>
             </div>
             {editing ? (
@@ -301,12 +255,7 @@ export default function DashboardProfile() {
             <Field label="Full Name" error={errors.name}>
               <IconInput icon="user" value={form.name} readOnly={!editing} onChange={(event) => setField('name', event.target.value)} />
             </Field>
-            {isDoctor ? (
-              <Field label="Specialization">
-                <IconInput icon="consult" value={form.specialization} readOnly={!editing} onChange={(event) => setField('specialization', event.target.value)} />
-              </Field>
-            ) : (
-              <Field label="Blood Type" error={errors.bloodGroup}>
+            <Field label="Blood Type" error={errors.bloodGroup}>
                 <IconSelect icon="drop" value={form.bloodGroup} disabled={!editing} onChange={(event) => setField('bloodGroup', event.target.value)}>
                   <option value="">Select Blood Type</option>
                   {BLOOD_GROUPS.map((type) => (
@@ -314,7 +263,6 @@ export default function DashboardProfile() {
                   ))}
                 </IconSelect>
               </Field>
-            )}
             <Field label="Email" error={errors.email}>
               <IconInput icon="mail" type="email" value={form.email} readOnly={!editing} onChange={(event) => setField('email', event.target.value)} />
             </Field>
@@ -324,20 +272,7 @@ export default function DashboardProfile() {
             <Field label="Age" error={errors.age}>
               <IconInput icon="calendar" value={form.age} readOnly={!editing} onChange={(event) => setField('age', event.target.value)} />
             </Field>
-            {isDoctor ? (
-              <>
-                <Field label="Medical Registration Number">
-                  <IconInput icon="shield" placeholder="BMDC-000000" value={form.registration} readOnly={!editing} onChange={(event) => setField('registration', event.target.value)} />
-                </Field>
-                <Field label="Years of Experience">
-                  <IconInput icon="clock" value={form.experience} readOnly={!editing} onChange={(event) => setField('experience', event.target.value)} />
-                </Field>
-                <Field label="Working Hospital/Clinic" className="sm:col-span-2">
-                  <IconInput icon="building" value={form.hospital} readOnly={!editing} onChange={(event) => setField('hospital', event.target.value)} />
-                </Field>
-              </>
-            ) : (
-              <>
+            <>
                 <Field label="Weight (kg)">
                   <IconInput icon="pulse" value={form.weight} readOnly={!editing} onChange={(event) => setField('weight', event.target.value)} />
                 </Field>
@@ -345,18 +280,17 @@ export default function DashboardProfile() {
                   <IconInput icon="phone" value={form.emergencyContact} readOnly={!editing} onChange={(event) => setField('emergencyContact', event.target.value)} />
                 </Field>
               </>
-            )}
             <Field label="Location" className="sm:col-span-2" error={errors.address}>
               <IconInput icon="pin" value={form.address} readOnly={!editing} onChange={(event) => setField('address', event.target.value)} />
             </Field>
-            <Field label={isDoctor ? 'Professional Bio' : 'Medical Conditions'} className="sm:col-span-2">
+            <Field label="Medical Conditions" className="sm:col-span-2">
               <textarea
                 rows="4"
                 readOnly={!editing}
-                value={isDoctor ? form.bio : form.medicalConditions}
+                value={form.medicalConditions}
                 className={`${dashInput} h-auto min-h-24 py-3`}
-                placeholder={isDoctor ? 'Qualifications, chamber hours, and care focus' : 'None'}
-                onChange={(event) => setField(isDoctor ? 'bio' : 'medicalConditions', event.target.value)}
+                placeholder="None"
+                onChange={(event) => setField('medicalConditions', event.target.value)}
               />
             </Field>
           </div>
@@ -408,42 +342,24 @@ export default function DashboardProfile() {
           <section className={`${cardClass} p-5`}>
             <h2 className="m-0 flex items-center gap-2 text-base font-extrabold">
               <Icon name="heart" className="h-5 w-5 text-brand" />
-              {isDoctor ? 'Consultation Status' : 'Donation Status'}
+              Donation Status
             </h2>
             <div className="mt-5 flex flex-col items-center text-center">
               <span className="grid h-16 w-16 place-items-center rounded-full bg-brand text-lg font-extrabold text-white">
-                {isDoctor ? 'MD' : form.bloodGroup || 'O+'}
+                {form.bloodGroup || 'O+'}
               </span>
               <p className={`mt-4 mb-0 flex items-center gap-2 font-bold ${
-                isDoctor
-                  ? user.available !== false ? 'text-emerald-600' : 'text-slate-500'
-                  : isDonationEligible(user.nextEligibleAt) && user.available !== false
+                isDonationEligible(user.nextEligibleAt) && user.available !== false
                     ? 'text-emerald-600'
                     : 'text-slate-500'
               }`}
               >
-                <Icon name={isDoctor || (isDonationEligible(user.nextEligibleAt) && user.available !== false) ? 'check' : 'clock'} className="h-4 w-4" />
-                {isDoctor
-                  ? user.available !== false
-                    ? 'Available for consults'
-                    : 'Currently unavailable'
-                  : isDonationEligible(user.nextEligibleAt) && user.available !== false
+                <Icon name={isDonationEligible(user.nextEligibleAt) && user.available !== false ? 'check' : 'clock'} className="h-4 w-4" />
+                {isDonationEligible(user.nextEligibleAt) && user.available !== false
                     ? 'Available to Donate'
                     : 'Waiting for next donation'}
               </p>
-              {isDoctor ? (
-                <>
-                  <p className="mt-1 mb-0 text-sm text-slate-500">Ready to take patients</p>
-                  <button
-                    type="button"
-                    className={`${btnOutline} mt-3 h-9`}
-                    onClick={() => updateUser({ available: user.available === false })}
-                  >
-                    {user.available !== false ? 'Set unavailable' : 'Set available'}
-                  </button>
-                </>
-              ) : (
-                <div className="mt-4 w-full">
+              <div className="mt-4 w-full">
                   <DonationCountdown until={user.nextEligibleAt} />
                   <button
                     type="button"
@@ -459,12 +375,11 @@ export default function DashboardProfile() {
                   </button>
                   <p className="mt-2 mb-0 text-xs text-slate-400">Wait {DONATION_WAIT_DAYS} days after each whole blood donation.</p>
                 </div>
-              )}
               <p className="mt-5 mb-0 text-4xl font-extrabold text-brand">
-                {isDoctor ? consultations : donations}
+                {donations}
               </p>
               <p className="mt-1 mb-0 text-sm text-slate-500">
-                {isDoctor ? 'Total Consultations' : 'Total Donations'}
+                Total Donations
               </p>
             </div>
           </section>
@@ -474,62 +389,14 @@ export default function DashboardProfile() {
               <Icon name="alert" className="h-5 w-5" /> Emergency Alerts
             </h2>
             <p className="mt-3 mb-0 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-              {isDoctor
-                ? 'Get notified when patients in your area need urgent medical advice around a blood request.'
-                : 'Get notified when your blood type is urgently needed in your area.'}
+                Get notified when your blood type is urgently needed in your area.
             </p>
           </section>
         </div>
       </div>
 
-      {isDoctor ? (
-        <section className={`${cardClass} mt-5 p-5 sm:p-6`}>
-          <h2 className="m-0 flex items-center gap-2 text-lg font-extrabold">
-            <Icon name="calendar" className="h-5 w-5 text-brand" /> Upcoming Appointments
-          </h2>
-          <p className="mt-1 mb-4 text-sm text-slate-500">Patients scheduled for phone, video, or chat consults.</p>
-          <div className="space-y-3">
-            {appointments.map((item) => {
-              const upcoming = item.status === 'Upcoming'
-              return (
-              <article key={item.id} className="flex flex-col gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center dark:border-slate-700">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="m-0 text-base font-extrabold">{item.name}</h3>
-                    <span className="rounded-full bg-brand px-2.5 py-0.5 text-xs font-bold text-white">{item.mode}</span>
-                  </div>
-                  <p className="mt-1 mb-0 text-sm text-slate-500">{item.detail}</p>
-                  <p className="mt-1 mb-0 flex items-center gap-1.5 text-sm text-slate-500">
-                    <Icon name="clock" className="h-4 w-4" /> {item.date}
-                  </p>
-                </div>
-                <span className={`self-start rounded-full px-2.5 py-1 text-xs font-bold ${
-                  upcoming ? 'bg-brand text-white' : 'bg-emerald-100 text-emerald-700'
-                }`}
-                >
-                  {item.status}
-                </span>
-                <button
-                  type="button"
-                  className="self-start text-slate-400 hover:text-brand"
-                  aria-label={`Remove ${item.name}`}
-                  onClick={() => {
-                    const next = appointments.filter((row) => row.id !== item.id)
-                    setAppointments(next)
-                    localStorage.setItem(appointmentKey, JSON.stringify(next))
-                  }}
-                >
-                  <Icon name="trash" />
-                </button>
-              </article>
-              )
-            })}
-          </div>
-        </section>
-      ) : null}
-
       <h2 className="mt-8 mb-4 text-lg font-extrabold">
-        {isDoctor ? 'Consultation Statistics' : 'Donation Statistics'}
+        Donation Statistics
       </h2>
       <div className="grid gap-4 sm:grid-cols-3">
         {stats.map(([icon, value, label]) => (

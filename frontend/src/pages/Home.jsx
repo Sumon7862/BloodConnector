@@ -2,10 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
 import DonorCard from '../components/DonorCard.jsx'
-import DoctorCard from '../components/DoctorCard.jsx'
 import OpinionSlider from '../components/OpinionSlider.jsx'
 import RequestCard from '../components/RequestCard.jsx'
-import BloodTypeBadge from '../components/BloodTypeBadge.jsx'
 import NetworkRoles from '../components/NetworkRoles.jsx'
 import SectionHeader from '../components/SectionHeader.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -13,8 +11,7 @@ import {
   BLOOD_TYPES,
   HOW_IT_WORKS,
 } from '../data/homeData.js'
-import { fetchBanks, fetchDonors } from '../lib/directory.js'
-import { fetchDoctors } from '../data/doctors.js'
+import { fetchDonors } from '../lib/directory.js'
 import { btnOutline, cardClass, inputClass, pageWidth } from '../lib/classes.js'
 import { filterDonors } from '../lib/donorsFilter.js'
 import { openRequests, useRequests } from '../lib/requests.js'
@@ -30,15 +27,12 @@ export default function Home() {
     city: params.get('city') || '',
     bloodType: params.get('bloodType') || '',
   }))
-  const [showAllBanks, setShowAllBanks] = useState(false)
   const [allDonors, setAllDonors] = useState([])
-  const [banks, setBanks] = useState([])
-  const [doctors, setDoctors] = useState([])
   const liveStats = [
     [String(allDonors.length), 'Directory donors'],
     [String(openRequests(requests).length), 'Open requests'],
-    [String(doctors.length), 'Volunteer doctors'],
-    ['24/7', 'Doctor support'],
+    [String(allDonors.filter((donor) => donor.status !== 'Inactive').length), 'Available now'],
+    ['24/7', 'Request support'],
   ]
 
   useEffect(() => {
@@ -48,8 +42,6 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false
     fetchDonors().then((list) => { if (!cancelled) setAllDonors(list) })
-    fetchBanks().then((list) => { if (!cancelled) setBanks(list) })
-    fetchDoctors().then((list) => { if (!cancelled) setDoctors(list) })
     return () => { cancelled = true }
   }, [])
 
@@ -72,7 +64,6 @@ export default function Home() {
     [query, allDonors],
   )
 
-  const visibleBanks = showAllBanks ? banks : banks.slice(0, 2)
   const donorQuery = new URLSearchParams()
   if (query.city) donorQuery.set('area', query.city)
   if (query.bloodType) donorQuery.set('bloodType', query.bloodType)
@@ -90,14 +81,13 @@ export default function Home() {
         <div className={`relative ${pageWidth} grid items-center gap-8 py-14 pb-24 sm:py-16 sm:pb-28 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12 lg:py-20`}>
           <div>
             <p className="m-0 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold tracking-[0.18em] text-white uppercase">
-              Patients · Donors · Doctors
+              Request · Donate
             </p>
             <h1 className="mt-4 mb-0 max-w-3xl text-[clamp(32px,6vw,56px)] leading-[1.08] font-extrabold tracking-tight text-white">
-              One network when blood and care cannot wait
+              One network when blood cannot wait
             </h1>
             <p className="mt-4 mb-0 max-w-xl text-base leading-relaxed text-white/90 sm:text-lg">
-              Patients request, donors respond, doctors advise. Find a match, check live units, and get
-              free medical support in the same place.
+              Every member is a donor. Request blood when you need it, and donate when someone else does.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -119,7 +109,7 @@ export default function Home() {
             <p className="m-0 text-xs font-extrabold tracking-wide text-white/75 uppercase">Emergency</p>
             <h2 className="mt-2 mb-1 text-xl font-extrabold text-white">Need help now?</h2>
             <p className="m-0 text-sm leading-relaxed text-white/85">
-              Call 999, pick a blood group to search donors, or reach a volunteer doctor.
+              Call 999, or pick a blood group to search donors near you.
             </p>
             <div className="mt-5 grid grid-cols-2 gap-2">
               <a
@@ -129,10 +119,10 @@ export default function Home() {
                 Call 999
               </a>
               <Link
-                to="/doctors"
+                to="/requests"
                 className="inline-flex h-11 items-center justify-center rounded-xl border border-white/40 font-extrabold text-white no-underline hover:bg-white/10"
               >
-                Call a doctor
+                See requests
               </Link>
             </div>
             <p className="mt-5 mb-2 text-xs font-bold tracking-wide text-white/75 uppercase">Jump to a blood group</p>
@@ -208,8 +198,8 @@ export default function Home() {
       <section className={`${pageWidth} pt-14 sm:pt-16`}>
         <SectionHeader
           eyebrow="The network"
-          title="Everyone has a role that saves a life"
-          subtitle="Patients ask. Donors give. Doctors keep the process safe."
+          title="Every member can help both ways"
+          subtitle="Request blood when you need it. Donate when a matching request comes in."
         />
         <NetworkRoles />
       </section>
@@ -217,7 +207,7 @@ export default function Home() {
       {urgent.length ? (
         <section className={`${pageWidth} pt-14 sm:pt-16`} id="requests">
           <SectionHeader
-            eyebrow="Patients"
+            eyebrow="Requests"
             title="Urgent blood requests"
             subtitle="Live asks from members. Matching donors get these on their dashboard."
           />
@@ -252,79 +242,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={`${pageWidth} pt-14 pb-6 sm:pt-16`} id="availability">
-        <SectionHeader
-          eyebrow="Blood banks"
-          title="Units near you"
-          subtitle="If a donor is still waiting, check live inventory from partner hospitals."
-        />
-        <div className="grid gap-4">
-          {visibleBanks.length ? visibleBanks.map((bank) => (
-            <article key={bank.id} className={`${cardClass} p-4 sm:p-5`}>
-              <div className="mb-4 flex flex-col justify-between gap-3 sm:gap-4 md:flex-row md:items-start">
-                <div>
-                  <h3 className="m-0 text-base font-extrabold sm:text-lg">{bank.name}</h3>
-                  <p className="mt-1 mb-0 text-sm text-slate-500">{bank.distance} away</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <a className={`${btnOutline} flex-1 sm:flex-none`} href={bank.map} target="_blank" rel="noreferrer">Directions</a>
-                  <a className={`${btnOutline} flex-1 sm:flex-none`} href={`tel:${bank.phone}`}>Call now</a>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
-                {BLOOD_TYPES.map((type) => (
-                  <div
-                    key={type}
-                    className={`rounded-xl border px-1.5 py-2.5 text-center ${
-                      query.bloodType === type
-                        ? 'border-brand bg-rose-50 dark:bg-brand/15'
-                        : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-panel-2'
-                    }`}
-                  >
-                    <BloodTypeBadge type={type} size="sm" className="mx-auto" />
-                    <span className="mt-1 block text-xs text-slate-500">{bank.units?.[type] ?? 0} Units</span>
-                  </div>
-                ))}
-              </div>
-            </article>
-          )) : (
-            <p className={`${cardClass} px-5 py-10 text-center text-slate-500`}>No partner blood banks listed yet.</p>
-          )}
-        </div>
-        {banks.length > 2 ? (
-          <div className="mt-6 flex justify-center">
-            <button type="button" className={`${btnOutline} h-11 px-6`} onClick={() => setShowAllBanks((open) => !open)}>
-              {showAllBanks ? 'Show fewer banks' : 'See more blood banks'}
-            </button>
-          </div>
-        ) : null}
-      </section>
-
-      <section className={`${pageWidth} pt-12 sm:pt-16`} id="doctors">
-        <SectionHeader
-          eyebrow="Doctors"
-          title="Free care for donors and patients"
-          subtitle="Volunteer physicians on call for eligibility, recovery, and emergencies."
-        />
-        {doctors.length ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {doctors.map((doctor) => (
-            <DoctorCard key={doctor.id} doctor={doctor} />
-          ))}
-        </div>
-        ) : (
-          <p className={`${cardClass} px-5 py-10 text-center text-slate-500`}>No volunteer doctors listed yet.</p>
-        )}
-        <div className="mt-6 flex justify-center">
-          <Link to="/doctors" className={`${btnOutline} h-11 px-6 no-underline`}>See all doctors</Link>
-        </div>
-      </section>
-
       <section className={`${pageWidth} pt-12 sm:pt-16`}>
         <SectionHeader
           eyebrow="How it works"
-          title="Three people. One outcome."
-          subtitle="A request, a match, and medical cover — without leaving BloodConnector."
+          title="Request. Match. Donate."
+          subtitle="The same members ask for blood and give it — without leaving BloodConnector."
         />
         <div className="grid gap-4 md:grid-cols-3">
           {HOW_IT_WORKS.map((item) => (

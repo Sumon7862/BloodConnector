@@ -32,7 +32,7 @@ export default function Gallery() {
   return (
     <Layout>
       <PageHero eyebrow="Gallery" title="Community gallery">
-        Patients, donors, and doctors share short notes here. Post or edit yours anytime.
+        Patients and donors share short notes here. Post or edit yours anytime.
       </PageHero>
 
       <div className={`${pageWidth} py-10 sm:py-14`}>

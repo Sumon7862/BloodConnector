@@ -1,6 +1,6 @@
 # BloodConnector
 
-Free public network for patients, blood donors, and volunteer doctors.
+Free public network for blood donors. Request blood and donate blood in one place.
 
 - Public site: `frontend/`
 - Admin panel: `admin/`
@@ -21,7 +21,7 @@ cd backend
 npm run clean-dummy
 ```
 
-The seeded admin account is kept. Public donor/doctor/bank lists start empty until you add real people in admin.
+The seeded admin account is kept. Public donor lists start empty until you add real people in admin.
 
 ### 2. API on Render
 

@@ -15,7 +15,6 @@ import { matchingRequestsFor, useRequests } from '../../lib/requests.js'
 export default function DashboardHome() {
   const { user, updateUser } = useAuth()
   const requests = useRequests()
-  const isDoctor = user.role === 'doctor'
   const firstName = String(user.name || 'there').split(' ')[0]
   const eligible = isDonationEligible(user.nextEligibleAt)
   const liveRequests = matchingRequestsFor(user, requests).slice(0, 3)
@@ -24,29 +23,18 @@ export default function DashboardHome() {
     document.title = 'BloodConnector — Dashboard'
   }, [])
 
-  const metrics = isDoctor
-    ? [
-        ['Consultations', Number(user.consultations) || 0, 'consult', 'Patients and donors you advised'],
-        ['Patients helped', Number(user.consultations) || 0, 'user', 'Emergency and recovery calls'],
-        ['Rating', user.rating || '—', 'star', 'From member reviews'],
-        ['Experience', `${user.experience || 0} yrs`, 'clock', 'On the BloodConnector desk'],
-      ]
-    : [
-        ['Donations', Number(user.donationCount) || 0, 'heart', 'Lives tied to your units'],
-        ['Lives supported', (Number(user.donationCount) || 0) * 3, 'user', 'About 3 per donation'],
-        ['Next eligible', eligible ? 'Now' : 'Wait', 'clock', eligible ? 'Ready to donate' : 'Countdown below'],
-        ['Blood group', user.bloodGroup || '—', 'drop', 'Used to match patient requests'],
-      ]
+  const metrics = [
+    ['Donations', Number(user.donationCount) || 0, 'heart', 'Lives tied to your units'],
+    ['Lives supported', (Number(user.donationCount) || 0) * 3, 'user', 'About 3 per donation'],
+    ['Next eligible', eligible ? 'Now' : 'Wait', 'clock', eligible ? 'Ready to donate' : 'Countdown below'],
+    ['Blood group', user.bloodGroup || '—', 'drop', 'Used to match blood requests'],
+  ]
 
   return (
     <div>
       <DashPageHead
         title={`Welcome back, ${firstName}`}
-        subtitle={
-          isDoctor
-            ? 'Patients and donors are counting on your advice. Keep the consultation desk open.'
-            : 'Answer matching requests, stay eligible, and call a doctor if you need cover.'
-        }
+        subtitle="Answer matching requests, stay eligible, and post a request when you need blood."
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -72,8 +60,7 @@ export default function DashboardHome() {
         ))}
       </div>
 
-      {!isDoctor ? (
-        <section className={`${cardClass} mt-5 p-5 sm:p-6`}>
+      <section className={`${cardClass} mt-5 p-5 sm:p-6`}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 className="m-0 text-lg font-extrabold">Your availability</h2>
@@ -98,24 +85,6 @@ export default function DashboardHome() {
             <DonationCountdown until={user.nextEligibleAt} />
           </div>
         </section>
-      ) : null}
-
-      {isDoctor ? (
-        <section className={`${cardClass} mt-6 p-5 sm:p-6`}>
-          <h2 className="m-0 text-lg font-extrabold">Your consultation desk</h2>
-          <p className="mt-2 mb-4 text-sm text-slate-500">
-            Donors check eligibility with you. Patients call when a match is in progress. Keep your number and hospital current in Profile.
-          </p>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Link to="/dashboard/consultation" className="inline-flex h-11 items-center justify-center rounded-xl bg-brand px-5 text-sm font-bold text-white no-underline hover:bg-brand-hover">
-              Open consultation tools
-            </Link>
-            <Link to="/requests" className={`${btnOutline} h-11 px-5 no-underline`}>
-              View live patient requests
-            </Link>
-          </div>
-        </section>
-      ) : null}
 
       <section className="mt-6">
         <div className="mb-4 flex items-center justify-between gap-2">

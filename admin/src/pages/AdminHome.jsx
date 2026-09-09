@@ -9,8 +9,6 @@ const CARDS = [
   ['users', 'Members', 'user', '/users'],
   ['openRequests', 'Open requests', 'alert', '/requests'],
   ['directoryDonors', 'Directory donors', 'people', '/donors'],
-  ['directoryDoctors', 'Doctors', 'consult', '/doctors'],
-  ['banks', 'Blood banks', 'drop', '/banks'],
   ['opinions', 'Opinions', 'heart', '/opinions'],
 ]
 
@@ -45,7 +43,7 @@ export default function AdminHome() {
       </div>
       {stats ? (
         <p className="mt-6 mb-0 text-sm text-slate-500">
-          {stats.donors} donors · {stats.doctors} doctors · {stats.blocked} blocked · {stats.pending} pending
+          {stats.donors} donors · {stats.blocked} blocked · {stats.pending} pending
         </p>
       ) : null}
     </div>
