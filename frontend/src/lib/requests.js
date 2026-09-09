@@ -40,6 +40,7 @@ export function matchingRequestsFor(user, list = []) {
   return openRequests(list).filter((item) => {
     if (item.requesterId === myId) return false
     if (!matchesBloodGroup(user?.bloodGroup, item.bloodType)) return false
+    if (item.dismissed) return false
     return !(item.dismissedBy || []).includes(myId)
   })
 }
@@ -60,7 +61,7 @@ export function userIdFrom(user) {
 
 export async function loadRequests() {
   try {
-    return await api('/requests', { auth: false })
+    return await api('/requests')
   } catch {
     return []
   }

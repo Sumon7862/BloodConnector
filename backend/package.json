@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "clean-dummy": "node src/scripts/cleanDummy.js"
+    "clean-dummy": "node src/scripts/cleanDummy.js",
+    "seed-dummy": "node src/scripts/seedDummyUsers.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

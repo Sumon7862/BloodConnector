@@ -50,32 +50,38 @@ export default function AdminRequests() {
         {requests.length ? requests.map((request) => (
           <article key={request.id} className={`${cardClass} p-4`}>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="m-0 flex flex-wrap items-center gap-2 font-extrabold">
-                  <BloodTypeBadge type={request.bloodType} size="sm" />
-                  {request.requesterName}
-                  <span className="text-xs font-bold tracking-wide text-slate-400 uppercase">{request.status}</span>
-                </p>
+              <div className="min-w-0 flex-1">
+                <p className="m-0 font-extrabold">{request.requesterName}</p>
                 <p className="mt-1 mb-0 text-sm text-slate-500">{request.location}</p>
                 <p className="mt-1 mb-0 text-sm text-slate-600 dark:text-slate-300">{request.details}</p>
-                <p className="mt-2 mb-0 text-xs text-slate-400">{request.responses?.length || 0} donor updates</p>
+                <p className="mt-2 mb-0 text-xs text-slate-400">{request.responses?.length || 0} donor updates · {request.status}</p>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {request.status === 'open' ? (
-                  <button type="button" className={`${btnOutline} h-9`} onClick={() => setStatus(request.id, 'filled')}>
-                    Mark filled
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                <div className="flex flex-col items-end gap-1.5">
+                  <BloodTypeBadge type={request.bloodType} size="lg" />
+                  {request.urgency ? (
+                    <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-[11px] font-bold text-brand dark:bg-brand/20">
+                      {request.urgency}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex flex-wrap justify-end gap-2">
+                  {request.status === 'open' ? (
+                    <button type="button" className={`${btnOutline} h-9`} onClick={() => setStatus(request.id, 'filled')}>
+                      Mark filled
+                    </button>
+                  ) : (
+                    <button type="button" className={`${btnOutline} h-9`} onClick={() => setStatus(request.id, 'open')}>
+                      Reopen
+                    </button>
+                  )}
+                  <button type="button" className={`${btnOutline} h-9`} onClick={() => setStatus(request.id, 'closed')}>
+                    Close
                   </button>
-                ) : (
-                  <button type="button" className={`${btnOutline} h-9`} onClick={() => setStatus(request.id, 'open')}>
-                    Reopen
+                  <button type="button" className="h-9 px-3 text-sm font-bold text-brand" onClick={() => remove(request.id)}>
+                    Delete
                   </button>
-                )}
-                <button type="button" className={`${btnOutline} h-9`} onClick={() => setStatus(request.id, 'closed')}>
-                  Close
-                </button>
-                <button type="button" className="h-9 px-3 text-sm font-bold text-brand" onClick={() => remove(request.id)}>
-                  Delete
-                </button>
+                </div>
               </div>
             </div>
           </article>

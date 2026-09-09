@@ -6,15 +6,23 @@ import { serialize, uid } from '../utils/ids.js'
 import { matchesBloodGroup } from '../utils/user.js'
 import { notifyMatchingDonors } from '../services/notificationService.js'
 
+function viewerId(user) {
+  if (!user) return ''
+  const obj = typeof user.toObject === 'function' ? user.toObject() : user
+  return obj.id || ''
+}
+
 function sanitizeRequest(item, viewer) {
-  const isOwner = viewer?.id === item.requesterId
+  const data = { ...item }
+  const id = viewerId(viewer)
+  data.dismissed = Boolean(id && (data.dismissedBy || []).includes(id))
+  const isOwner = id === data.requesterId
   const isAdmin = viewer?.role === 'admin'
-  if (isOwner || isAdmin) return item
-  const safe = { ...item }
-  delete safe.dismissedBy
-  delete safe.responses
-  if (!matchesBloodGroup(viewer?.bloodGroup, item.bloodType)) delete safe.contact
-  return safe
+  if (isOwner || isAdmin) return data
+  delete data.dismissedBy
+  delete data.responses
+  if (!matchesBloodGroup(viewer?.bloodGroup, data.bloodType)) delete data.contact
+  return data
 }
 
 export const listRequests = asyncHandler(async (req, res) => {
@@ -110,11 +118,11 @@ export const respondToRequest = asyncHandler(async (req, res) => {
 export const dismissRequest = asyncHandler(async (req, res) => {
   const request = await BloodRequest.findOne({ id: req.params.id })
   if (!request) return sendError(res, 404, 'Request not found.')
-  if (!request.dismissedBy.includes(req.user.id)) {
-    request.dismissedBy.push(req.user.id)
+  if (!request.dismissedBy.includes(viewerId(req.user))) {
+    request.dismissedBy.push(viewerId(req.user))
     await request.save()
   }
-  res.json(serialize(request))
+  res.json(sanitizeRequest(serialize(request), req.user))
 })
 
 export const closeRequest = asyncHandler(async (req, res) => {

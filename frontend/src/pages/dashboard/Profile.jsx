@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import DashPageHead from '../../components/DashPageHead.jsx'
 import { Icon } from '../../components/DashIcons.jsx'
 import { IconInput, IconSelect } from '../../components/IconField.jsx'
@@ -6,6 +7,7 @@ import { btnOutline, cardClass, dashInput } from '../../lib/classes.js'
 import { readImageFile, roleLabel } from '../../lib/user.js'
 import DonationCountdown from '../../components/DonationCountdown.jsx'
 import BloodTypeBadge from '../../components/BloodTypeBadge.jsx'
+import RequestCard from '../../components/RequestCard.jsx'
 import { DONATION_WAIT_DAYS, isDonationEligible, markDonatedNow } from '../../lib/eligibility.js'
 import {
   BLOOD_GROUPS,
@@ -17,6 +19,7 @@ import {
   validatePhone,
 } from '../../utils/validation.js'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { matchingRequestsFor, useRequests } from '../../lib/requests.js'
 
 function joinLabel(iso) {
   try {
@@ -52,6 +55,8 @@ function formFromUser(user) {
 
 export default function DashboardProfile() {
   const { user, updateUser } = useAuth()
+  const requests = useRequests()
+  const matching = useMemo(() => matchingRequestsFor(user, requests), [user, requests])
   const extraPhones = user.phones || []
 
   const [editing, setEditing] = useState(false)
@@ -394,6 +399,43 @@ export default function DashboardProfile() {
           </section>
         </div>
       </div>
+
+      <section className="mt-8">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div>
+            <h2 className="m-0 text-lg font-extrabold">Matching requested blood</h2>
+            <p className="mt-1 mb-0 text-sm text-slate-500">
+              {user.bloodGroup ? (
+                <>
+                  Open <BloodTypeBadge type={user.bloodGroup} size="sm" /> requests you can donate to. Cancel if you cannot help.
+                </>
+              ) : (
+                'Add your blood group to see requests that match you.'
+              )}
+            </p>
+          </div>
+          <Link to="/dashboard/open-requests" className="text-sm font-bold text-brand no-underline hover:underline">
+            See all
+          </Link>
+        </div>
+        {matching.length ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {matching.slice(0, 3).map((request) => (
+              <RequestCard key={request.id} request={request} mode="inbox" />
+            ))}
+          </div>
+        ) : (
+          <p className={`${cardClass} px-5 py-8 text-center text-sm text-slate-500`}>
+            {user.bloodGroup ? (
+              <>
+                No open <BloodTypeBadge type={user.bloodGroup} size="sm" /> requests right now.
+              </>
+            ) : (
+              'Add your blood group in the form above to receive matching requests.'
+            )}
+          </p>
+        )}
+      </section>
 
       <h2 className="mt-8 mb-4 text-lg font-extrabold">
         Donation Statistics

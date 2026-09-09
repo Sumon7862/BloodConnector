@@ -17,6 +17,8 @@ export default function DashboardLayout() {
     { to: '/dashboard/open-requests', label: 'Matching Requests', icon: 'alert' },
     { to: '/dashboard/people', label: 'Family & Donors', icon: 'people' },
     { to: '/dashboard/donations', label: 'My Donations', icon: 'heart' },
+    { to: '/dashboard/gallery', label: 'Gallery', icon: 'gallery' },
+    { to: '/dashboard/blood-types', label: 'Blood Types', icon: 'types' },
     { to: '/dashboard/notifications', label: 'Notifications', icon: 'bell' },
     { to: '/dashboard/settings', label: 'Settings', icon: 'gear' },
   ]

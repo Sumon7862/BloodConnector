@@ -42,16 +42,16 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
       <div className="flex items-start gap-3">
         <DonorAvatar name={request.requesterName} photo={request.requesterPhoto} size="sm" />
         <div className="min-w-0 flex-1">
-          <p className="m-0 flex flex-wrap items-center gap-2">
-            <BloodTypeBadge type={request.bloodType} size="lg" />
-            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${urgencyClass(request.urgency)}`}>
-              {request.urgency}
-            </span>
-          </p>
-          <p className="mt-2 mb-0 text-[11px] font-bold tracking-wide text-slate-400 uppercase">Requested by</p>
+          <p className="mt-0 mb-0 text-[11px] font-bold tracking-wide text-slate-400 uppercase">Requested by</p>
           <h3 className="mt-0.5 mb-0 truncate text-base font-extrabold">{request.requesterName}</h3>
           <p className="mt-1 mb-0 text-sm text-slate-500 dark:text-slate-400">{request.location}</p>
           <p className="mt-1 mb-0 text-xs text-slate-400">{formatRequestTime(request.createdAt)}</p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <BloodTypeBadge type={request.bloodType} size="lg" />
+          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${urgencyClass(request.urgency)}`}>
+            {request.urgency}
+          </span>
         </div>
       </div>
 
@@ -90,7 +90,13 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
           <button
             type="button"
             className={`${btnOutline} h-10 flex-1`}
-            onClick={() => dismissRequest(request.id).catch(() => {})}
+            onClick={async () => {
+              try {
+                await dismissRequest(request.id)
+              } catch (error) {
+                window.alert(error instanceof Error ? error.message : 'Could not cancel that request.')
+              }
+            }}
           >
             Cancel
           </button>
@@ -106,7 +112,9 @@ export default function RequestCard({ request, mode = 'feed', showResponses = fa
             <button
               type="button"
               className={`${btnOutline} h-10 px-4`}
-              onClick={() => closeRequest(request.id, user, 'filled').catch(() => {})}
+              onClick={() => closeRequest(request.id, user, 'filled').catch((error) => {
+                window.alert(error instanceof Error ? error.message : 'Could not update that request.')
+              })}
             >
               Mark as filled
             </button>
